@@ -1919,7 +1919,7 @@ async function changeTaskPrio(id, prio){
   await dbPut('tasks', t);
   renderTasks();
 }
-document.getElementById('stat-notes').textContent=notes.length;document.getElementById('stat-cal').textContent=events.length;document.getElementById('stat-tasks').textContent=tasks.filter(t=>!t.done).length}
+function renderStats(){document.getElementById('stat-notes').textContent=notes.length;document.getElementById('stat-cal').textContent=events.length;document.getElementById('stat-tasks').textContent=tasks.filter(t=>!t.done).length}
 async function deleteItem(store,id){await dbDelete(store,id);if(store==='notes')notes=notes.filter(x=>x.id!==id);if(store==='events')events=events.filter(x=>x.id!==id);if(store==='tasks')tasks=tasks.filter(x=>x.id!==id);renderAll()}
 async function toggleTask(id){const t=tasks.find(x=>x.id===id);if(!t)return;t.done=!t.done;await dbPut('tasks',t);renderTasks();renderStats()}
 
