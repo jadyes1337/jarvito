@@ -769,6 +769,62 @@ nav::-webkit-scrollbar { display: none; }
   margin-top: 8px; min-height: 16px; text-align: center; letter-spacing: .1em;
 }
 
+/* ── Task add form ── */
+.tasks-add-form {
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(7,14,20,.9);
+  flex-shrink: 0;
+}
+.tasks-add-row { display: flex; gap: 8px; align-items: center; }
+.tasks-add-input {
+  flex: 1; background: rgba(0,229,255,.05);
+  border: 1px solid rgba(0,229,255,.2); border-radius: 10px;
+  padding: 11px 14px; color: var(--c);
+  font-family: var(--font-body); font-size: 15px;
+  outline: none; caret-color: var(--c); transition: border-color .2s;
+  -webkit-appearance: none;
+}
+.tasks-add-input:focus { border-color: rgba(0,229,255,.5); }
+.tasks-add-input::placeholder { color: var(--text3); }
+.tasks-add-btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(0,229,255,.12); border: 1px solid rgba(0,229,255,.4);
+  color: var(--c); font-size: 22px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .15s;
+}
+.tasks-add-btn:active { background: rgba(0,229,255,.28); transform: scale(.92); }
+.tasks-add-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 10px; }
+.task-prio-select { display: flex; gap: 4px; }
+.tps-btn {
+  padding: 5px 11px; border-radius: 20px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em;
+  border: 1px solid var(--border); background: transparent; color: var(--text3);
+  transition: all .15s;
+}
+.tps-btn[data-p="high"].active  { background: rgba(255,77,109,.12); border-color: rgba(255,77,109,.5); color: var(--r); }
+.tps-btn[data-p="medium"].active{ background: rgba(255,209,102,.1); border-color: rgba(255,209,102,.5); color: var(--y); }
+.tps-btn[data-p="low"].active   { background: rgba(0,255,179,.08); border-color: rgba(0,255,179,.4); color: var(--g); }
+.tasks-add-date {
+  background: rgba(0,229,255,.04); border: 1px solid rgba(0,229,255,.15);
+  border-radius: 8px; padding: 5px 10px;
+  font-size: 12px; font-family: var(--font-mono);
+  outline: none; -webkit-appearance: none; cursor: pointer;
+  color-scheme: dark; color: var(--text3);
+}
+/* task card inline prio pills */
+.task-card-prio-row { display: flex; gap: 4px; margin-top: 8px; padding-left: 27px; }
+.task-prio-pill {
+  padding: 3px 9px; border-radius: 20px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .1em;
+  border: 1px solid var(--border); background: transparent; color: var(--text3);
+  transition: all .12s;
+}
+.task-prio-pill.sel-high  { background: rgba(255,77,109,.12); border-color: rgba(255,77,109,.5); color: var(--r); }
+.task-prio-pill.sel-medium{ background: rgba(255,209,102,.1); border-color: rgba(255,209,102,.5); color: var(--y); }
+.task-prio-pill.sel-low   { background: rgba(0,255,179,.08); border-color: rgba(0,255,179,.4); color: var(--g); }
+
 /* Scrollbar global */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-thumb { background: rgba(0,229,255,.15); border-radius: 2px; }
@@ -1111,6 +1167,21 @@ nav::-webkit-scrollbar { display: none; }
 
   <!-- TASKS -->
   <div class="panel" id="panel-tasks">
+    <!-- Add task form -->
+    <div class="tasks-add-form" id="tasks-add-form">
+      <div class="tasks-add-row">
+        <input class="tasks-add-input" id="task-add-input" type="text" placeholder="Nowe zadanie..." onkeydown="if(event.key==='Enter')addTaskManual()">
+        <button class="tasks-add-btn" onclick="addTaskManual()">＋</button>
+      </div>
+      <div class="tasks-add-meta">
+        <div class="task-prio-select" id="task-prio-select">
+          <button class="tps-btn active" data-p="low"    onclick="selectNewPrio('low',this)">● LOW</button>
+          <button class="tps-btn"        data-p="medium" onclick="selectNewPrio('medium',this)">● MED</button>
+          <button class="tps-btn"        data-p="high"   onclick="selectNewPrio('high',this)">● HIGH</button>
+        </div>
+        <input class="tasks-add-date" id="task-add-date" type="date" title="Termin (opcjonalnie)">
+      </div>
+    </div>
     <div class="tasks-toolbar">
       <div class="tasks-filters">
         <button class="task-filter-btn active" onclick="setTaskFilter('all',this)">WSZYSTKIE</button>
@@ -1118,10 +1189,10 @@ nav::-webkit-scrollbar { display: none; }
         <button class="task-filter-btn" onclick="setTaskFilter('done',this)">UKOŃCZONE</button>
       </div>
       <div class="tasks-priority-filter">
-        <button class="task-prio-btn active" onclick="setTaskPrio('all',this)" title="Wszystkie priorytety">●●●</button>
-        <button class="task-prio-btn high" onclick="setTaskPrio('high',this)" title="Wysoki">● HIGH</button>
-        <button class="task-prio-btn med" onclick="setTaskPrio('medium',this)" title="Średni">● MED</button>
-        <button class="task-prio-btn low" onclick="setTaskPrio('low',this)" title="Niski">● LOW</button>
+        <button class="task-prio-btn active" onclick="setTaskPrio('all',this)">●●●</button>
+        <button class="task-prio-btn high" onclick="setTaskPrio('high',this)">● H</button>
+        <button class="task-prio-btn med" onclick="setTaskPrio('medium',this)">● M</button>
+        <button class="task-prio-btn low" onclick="setTaskPrio('low',this)">● L</button>
       </div>
     </div>
     <div class="tasks-progress-bar-wrap" id="tasks-progress-wrap">
@@ -1804,23 +1875,51 @@ function renderTasks(){
 }
 
 function taskCardHTML(t, today){
-  const prioClass='prio-'+(t.priority||'medium');
+  const p=t.priority||'medium';
   const doneClass=t.done?'done-card':'';
   const overdue=t.dueDate&&!t.done&&t.dueDate<today;
-  const dueLabel=t.dueDate?`<span class="task-card-due${overdue?' overdue':''}">📅 ${overdue?'OVERDUE · ':''}${t.dueDate}</span>`:'';
-  return `<div class="task-card ${prioClass} ${doneClass}">
+  const dueLabel=t.dueDate?`<span class="task-card-due${overdue?' overdue':''}">📅 ${overdue?'⚠ ':''}${t.dueDate}</span>`:'';
+  const prioPills=['low','medium','high'].map(pp=>
+    `<button class="task-prio-pill${p===pp?' sel-'+pp:''}" onclick="changeTaskPrio(${t.id},'${pp}')">${pp==='low'?'LOW':pp==='medium'?'MED':'HIGH'}</button>`
+  ).join('');
+  return `<div class="task-card prio-${p} ${doneClass}" id="tcard-${t.id}">
     <button class="task-card-del" onclick="deleteItem('tasks',${t.id})">✕</button>
     <div class="task-card-row">
       <input type="checkbox" class="task-card-cb" ${t.done?'checked':''} onchange="toggleTask(${t.id})">
       <span class="task-card-title">${esc(t.title)}</span>
     </div>
-    <div class="task-card-badges">
-      <span class="badge badge-${t.priority||'medium'}">${(t.priority||'medium').toUpperCase()}</span>
-      ${dueLabel}
-    </div>
+    <div class="task-card-prio-row">${prioPills}${dueLabel?`<span style="margin-left:6px">${dueLabel}</span>`:''}</div>
   </div>`;
 }
-function renderStats(){document.getElementById('stat-notes').textContent=notes.length;document.getElementById('stat-cal').textContent=events.length;document.getElementById('stat-tasks').textContent=tasks.filter(t=>!t.done).length}
+// ── Manual task add ──
+let newTaskPrio = 'low';
+
+function selectNewPrio(p, btn){
+  newTaskPrio = p;
+  document.querySelectorAll('#task-prio-select .tps-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+async function addTaskManual(){
+  const inp = document.getElementById('task-add-input');
+  const title = inp.value.trim();
+  if(!title) return;
+  const dueDate = document.getElementById('task-add-date').value || '';
+  const id = await dbAdd('tasks',{title, priority: newTaskPrio, dueDate, done: false});
+  tasks.push({id, title, priority: newTaskPrio, dueDate, done: false, createdAt: new Date().toISOString()});
+  inp.value = '';
+  document.getElementById('task-add-date').value = '';
+  renderTasks(); renderStats();
+}
+
+async function changeTaskPrio(id, prio){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  t.priority = prio;
+  await dbPut('tasks', t);
+  renderTasks();
+}
+document.getElementById('stat-notes').textContent=notes.length;document.getElementById('stat-cal').textContent=events.length;document.getElementById('stat-tasks').textContent=tasks.filter(t=>!t.done).length}
 async function deleteItem(store,id){await dbDelete(store,id);if(store==='notes')notes=notes.filter(x=>x.id!==id);if(store==='events')events=events.filter(x=>x.id!==id);if(store==='tasks')tasks=tasks.filter(x=>x.id!==id);renderAll()}
 async function toggleTask(id){const t=tasks.find(x=>x.id===id);if(!t)return;t.done=!t.done;await dbPut('tasks',t);renderTasks();renderStats()}
 
