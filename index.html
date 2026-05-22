@@ -825,6 +825,109 @@ nav::-webkit-scrollbar { display: none; }
 .task-prio-pill.sel-medium{ background: rgba(255,209,102,.1); border-color: rgba(255,209,102,.5); color: var(--y); }
 .task-prio-pill.sel-low   { background: rgba(0,255,179,.08); border-color: rgba(0,255,179,.4); color: var(--g); }
 
+/* ── Cal toolbar right ── */
+.cal-toolbar { justify-content: space-between; }
+.cal-toolbar-right { display: flex; align-items: center; gap: 8px; }
+.cal-add-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.4);
+  color: var(--c); font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0;
+}
+.cal-add-btn:active { background: rgba(0,229,255,.25); transform: scale(.92); }
+.cal-drawer-add-btn {
+  padding: 5px 12px; border-radius: 6px;
+  background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.35);
+  color: var(--c); font-family: var(--font-mono); font-size: 9px;
+  letter-spacing: .12em; cursor: pointer; transition: all .15s;
+}
+.cal-drawer-add-btn:active { background: rgba(0,229,255,.22); }
+
+/* ── Add event modal ── */
+.cal-modal-overlay {
+  position: fixed; inset: 0; z-index: 9000;
+  background: rgba(0,0,0,.65); backdrop-filter: blur(8px);
+  display: none; align-items: flex-end; justify-content: center;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.cal-modal-overlay.open { display: flex; animation: slideUp .25s ease; }
+@keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:none;opacity:1} }
+.cal-modal {
+  width: 100%; max-width: 560px;
+  background: rgba(7,14,20,.98); border: 1px solid var(--border);
+  border-top: 1px solid rgba(0,229,255,.3);
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+}
+.cal-modal-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.cal-modal-title {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .25em; color: var(--c);
+}
+.cal-modal-body { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+.cal-modal-input {
+  width: 100%; background: rgba(0,229,255,.04);
+  border: 1px solid rgba(0,229,255,.18); border-radius: 10px;
+  padding: 11px 14px; color: var(--text);
+  font-family: var(--font-body); font-size: 15px;
+  outline: none; transition: border-color .2s;
+  -webkit-appearance: none; color-scheme: dark;
+}
+.cal-modal-input:focus { border-color: rgba(0,229,255,.5); }
+.cal-modal-input::placeholder { color: var(--text3); }
+.cal-modal-textarea { resize: none; height: 70px; }
+.cal-modal-time-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.cal-modal-time-group { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.cal-modal-label {
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .2em; color: var(--text3);
+  padding-left: 4px;
+}
+.cal-modal-time { text-align: center; }
+.cal-modal-time-sep {
+  font-family: var(--font-mono); font-size: 14px; color: var(--text3);
+  flex-shrink: 0; margin-top: 18px;
+}
+.cal-modal-save-btn {
+  width: 100%; padding: 14px;
+  background: rgba(0,229,255,.12); border: 1px solid rgba(0,229,255,.45);
+  border-radius: 12px; color: var(--c);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em;
+  cursor: pointer; transition: all .15s; margin-top: 4px;
+}
+.cal-modal-save-btn:active { background: rgba(0,229,255,.25); }
+.cal-modal-err {
+  font-family: var(--font-mono); font-size: 10px; color: var(--r);
+  text-align: center; min-height: 16px;
+}
+
+/* ── Task checkbox — custom toggle ── */
+.task-card-cb { display: none; }
+.task-toggle {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; cursor: pointer;
+  border: 2px solid rgba(0,229,255,.4); background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .18s; position: relative; margin-top: 1px;
+}
+.task-toggle::after {
+  content: ''; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--c); opacity: 0; transform: scale(0);
+  transition: all .18s;
+}
+.task-toggle.checked {
+  border-color: var(--g); background: rgba(0,255,179,.12);
+  box-shadow: 0 0 12px rgba(0,255,179,.25);
+}
+.task-toggle.checked::after {
+  background: var(--g); opacity: 1; transform: scale(1);
+}
+.task-toggle.checked ~ .task-card-title { text-decoration: line-through; opacity: .5; }
+
 /* Scrollbar global */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-thumb { background: rgba(0,229,255,.15); border-radius: 2px; }
@@ -875,6 +978,15 @@ nav::-webkit-scrollbar { display: none; }
 }
 .note-item:hover { background: rgba(0,229,255,.05); border-color: rgba(0,229,255,.12); }
 .note-item.active { background: rgba(0,229,255,.1); border-color: rgba(0,229,255,.35); }
+.note-item-row { display: flex; align-items: center; gap: 6px; }
+.note-item-del {
+  background: transparent; border: none; color: rgba(255,77,109,.25);
+  font-size: 14px; cursor: pointer; padding: 4px 6px; border-radius: 6px;
+  flex-shrink: 0; transition: all .15s; opacity: 0;
+}
+.note-item:hover .note-item-del { opacity: 1; }
+.note-item-del:hover { color: var(--r); background: rgba(255,77,109,.08); }
+
 .note-item-title {
   font-size: 12px; font-weight: 600; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1147,10 +1259,13 @@ nav::-webkit-scrollbar { display: none; }
         <span class="cal-period-label" id="cal-period-label"></span>
         <button class="cal-nav-btn" onclick="calShift(1)">›</button>
       </div>
-      <div class="cal-view-seg">
-        <button class="cal-seg-btn active" id="seg-month" onclick="setCalView('month',this)">MIESIĄC</button>
-        <button class="cal-seg-btn" id="seg-week"  onclick="setCalView('week',this)">TYDZIEŃ</button>
-        <button class="cal-seg-btn" id="seg-day"   onclick="setCalView('day',this)">DZIEŃ</button>
+      <div class="cal-toolbar-right">
+        <button class="cal-add-btn" onclick="openAddEventModal()" title="Dodaj wydarzenie">＋</button>
+        <div class="cal-view-seg">
+          <button class="cal-seg-btn active" id="seg-month" onclick="setCalView('month',this)">MIE</button>
+          <button class="cal-seg-btn" id="seg-week"  onclick="setCalView('week',this)">TYG</button>
+          <button class="cal-seg-btn" id="seg-day"   onclick="setCalView('day',this)">DZI</button>
+        </div>
       </div>
     </div>
     <!-- Cal grid -->
@@ -1159,9 +1274,40 @@ nav::-webkit-scrollbar { display: none; }
     <div class="cal-drawer" id="cal-drawer">
       <div class="cal-drawer-hdr">
         <span id="cal-drawer-date"></span>
-        <button onclick="closeDrawer()">✕</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="cal-drawer-add-btn" id="cal-drawer-add-btn" onclick="openAddEventModal(currentDrawerDate)">＋ Dodaj</button>
+          <button onclick="closeDrawer()" style="background:transparent;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px 8px">✕</button>
+        </div>
       </div>
       <div id="cal-drawer-list"></div>
+    </div>
+  </div>
+
+  <!-- ADD EVENT MODAL -->
+  <div class="cal-modal-overlay" id="cal-modal-overlay" onclick="closeAddEventModal()">
+    <div class="cal-modal" onclick="event.stopPropagation()">
+      <div class="cal-modal-hdr">
+        <span class="cal-modal-title">NOWE WYDARZENIE</span>
+        <button onclick="closeAddEventModal()" style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div class="cal-modal-body">
+        <input class="cal-modal-input" id="cme-title" type="text" placeholder="Tytuł wydarzenia...">
+        <input class="cal-modal-input" id="cme-date" type="date">
+        <div class="cal-modal-time-row">
+          <div class="cal-modal-time-group">
+            <label class="cal-modal-label">OD</label>
+            <input class="cal-modal-input cal-modal-time" id="cme-time-start" type="time">
+          </div>
+          <div class="cal-modal-time-sep">→</div>
+          <div class="cal-modal-time-group">
+            <label class="cal-modal-label">DO</label>
+            <input class="cal-modal-input cal-modal-time" id="cme-time-end" type="time">
+          </div>
+        </div>
+        <textarea class="cal-modal-input cal-modal-textarea" id="cme-desc" placeholder="Opis (opcjonalnie)..."></textarea>
+        <button class="cal-modal-save-btn" onclick="saveEventFromModal()">DODAJ WYDARZENIE ▶</button>
+        <div class="cal-modal-err" id="cme-err"></div>
+      </div>
     </div>
   </div>
 
@@ -1322,7 +1468,7 @@ Dostępne intenty: "note" | "event" | "task" | "delete_note" | "delete_event" | 
 
 Formaty obiektów:
 - note:          {"intent":"note","title":"...","content":"..."}
-- event:         {"intent":"event","title":"...","date":"YYYY-MM-DD","time":"HH:MM","description":"..."}
+- event:         {"intent":"event","title":"...","date":"YYYY-MM-DD","time":"HH:MM","timeEnd":"HH:MM","description":"..."}
 - task:          {"intent":"task","title":"...","priority":"high|medium|low","dueDate":"YYYY-MM-DD lub pusty string"}
 - delete_note:   {"intent":"delete_note","id":123,"title":"..."}
 - delete_event:  {"intent":"delete_event","id":123,"title":"..."}
@@ -1370,9 +1516,10 @@ async function processAction(r){
     return {type:'note', msg:`Notatka zapisana ✓\n"${r.title}"`};
 
   }else if(r.intent==='event'){
-    const id=await dbAdd('events',{title:r.title,date:r.date,time:r.time||'',description:r.description||''});
-    events.push({id,title:r.title,date:r.date,time:r.time||'',description:r.description||'',createdAt:new Date().toISOString()});
-    return {type:'event', msg:`Wydarzenie dodane ✓\n"${r.title}" · ${r.date}${r.time?' o '+r.time:''}`};
+    const id=await dbAdd('events',{title:r.title,date:r.date,time:r.time||'',timeEnd:r.timeEnd||'',description:r.description||''});
+    events.push({id,title:r.title,date:r.date,time:r.time||'',timeEnd:r.timeEnd||'',description:r.description||'',createdAt:new Date().toISOString()});
+    const timeStr=r.time?(r.timeEnd?` ${r.time}–${r.timeEnd}`:` o ${r.time}`):'';
+    return {type:'event', msg:`Wydarzenie dodane ✓\n"${r.title}" · ${r.date}${timeStr}` };
 
   }else if(r.intent==='task'){
     const id=await dbAdd('tasks',{title:r.title,priority:r.priority||'medium',dueDate:r.dueDate||'',done:false});
@@ -1509,9 +1656,14 @@ function renderNotes(){
   }
   el.innerHTML=filtered.map(n=>`
     <div class="note-item${n.id===currentNoteId?' active':''}" onclick="openNote(${n.id})">
-      <div class="note-item-title">${esc(n.title||'Bez tytułu')}</div>
-      <div class="note-item-preview">${esc((n.content||'').substring(0,60))}</div>
-      <div class="note-item-date">${new Date(n.createdAt).toLocaleDateString('pl-PL',{day:'numeric',month:'short'})}</div>
+      <div class="note-item-row">
+        <div style="flex:1;min-width:0">
+          <div class="note-item-title">${esc(n.title||'Bez tytułu')}</div>
+          <div class="note-item-preview">${esc((n.content||'').substring(0,60))}</div>
+          <div class="note-item-date">${new Date(n.createdAt).toLocaleDateString('pl-PL',{day:'numeric',month:'short'})}</div>
+        </div>
+        <button class="note-item-del" onclick="event.stopPropagation();deleteNoteById(${n.id})">🗑</button>
+      </div>
     </div>`).join('');
 }
 
@@ -1569,10 +1721,21 @@ async function saveCurrentNote(){
   setTimeout(()=>ind.classList.remove('show'),1800);
 }
 
+async function deleteNoteById(id){
+  if(!confirm('Usunąć tę notatkę?')) return;
+  await deleteItem('notes', id);
+  if(currentNoteId===id){
+    currentNoteId=null;
+    document.getElementById('notes-editor-empty').style.display='';
+    document.getElementById('notes-editor-inner').style.display='none';
+  }
+  renderNotes();
+}
+
 async function deleteCurrentNote(){
-  if(!currentNoteId)return;
-  if(!confirm('Usunąć tę notatkę?'))return;
-  await deleteItem('notes',currentNoteId);
+  if(!currentNoteId) return;
+  if(!confirm('Usunąć tę notatkę?')) return;
+  await deleteItem('notes', currentNoteId);
   currentNoteId=null;
   document.getElementById('notes-editor-empty').style.display='';
   document.getElementById('notes-editor-inner').style.display='none';
@@ -1714,8 +1877,13 @@ function renderWeek(){
       if(!ev.time) return;
       const [hh,mm]=ev.time.split(':').map(Number);
       const top=(hh+(mm||0)/60)*48;
-      const height=48;
-      html+=`<div class="cal-week-event" style="top:${top}px;height:${height}px" onclick="openDrawer('${ds}')" title="${esc(ev.title)}">${esc(ev.time)} ${esc(ev.title)}</div>`;
+      let height=48;
+      if(ev.timeEnd){
+        const [eh,em]=ev.timeEnd.split(':').map(Number);
+        height=Math.max(24,((eh+(em||0)/60)-(hh+(mm||0)/60))*48);
+      }
+      const timeLabel=ev.timeEnd?`${ev.time}–${ev.timeEnd}`:ev.time;
+      html+=`<div class="cal-week-event" style="top:${top}px;height:${height}px" onclick="openDrawer('${ds}')" title="${esc(ev.title)}">${esc(timeLabel)} ${esc(ev.title)}</div>`;
     });
     html+='</div>';
   });
@@ -1757,7 +1925,13 @@ function renderDay(){
     if(!ev.time) return;
     const [hh,mm]=ev.time.split(':').map(Number);
     const top=(hh+(mm||0)/60)*48;
-    html+=`<div class="cal-day-event" style="top:${top}px;min-height:44px" onclick="openDrawer('${ds}')">${esc(ev.time)} <strong>${esc(ev.title)}</strong>${ev.description?'<br><span style=\'font-size:10px;opacity:.7\'>'+esc(ev.description)+'</span>':''}</div>`;
+    let height=48;
+    if(ev.timeEnd){
+      const [eh,em]=ev.timeEnd.split(':').map(Number);
+      height=Math.max(32,((eh+(em||0)/60)-(hh+(mm||0)/60))*48);
+    }
+    const timeLabel=ev.timeEnd?`${ev.time}–${ev.timeEnd}`:ev.time;
+    html+=`<div class="cal-day-event" style="top:${top}px;min-height:${height}px" onclick="openDrawer('${ds}')">${esc(timeLabel)} <strong>${esc(ev.title)}</strong>${ev.description?'<br><span style=\'font-size:10px;opacity:.7\'>'+esc(ev.description)+'</span>':''}</div>`;
   });
   if(nowMinutes>=0){
     html+=`<div class="cal-now-line" style="top:${nowMinutes/60*48}px"></div>`;
@@ -1782,16 +1956,18 @@ function renderDay(){
 }
 
 // ── Drawer ──
+let currentDrawerDate = null;
 function openDrawer(dateStr){
+  currentDrawerDate = dateStr;
   const evs=eventsForDate(dateStr);
   const label=new Date(dateStr).toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'});
   document.getElementById('cal-drawer-date').textContent=label.toUpperCase();
   if(!evs.length){
-    document.getElementById('cal-drawer-list').innerHTML='<div class="empty" style="margin:20px 0;font-size:10px">BRAK WYDARZEŃ<br>Powiedz Jarvisowi co dodać</div>';
+    document.getElementById('cal-drawer-list').innerHTML='<div class="empty" style="margin:20px 0;font-size:10px">BRAK WYDARZEŃ</div>';
   } else {
     document.getElementById('cal-drawer-list').innerHTML=evs.map(e=>`
       <div class="cal-drawer-item">
-        <div class="cal-drawer-time">${e.time||'—'}</div>
+        <div class="cal-drawer-time">${e.time||'—'}${e.timeEnd?' → '+e.timeEnd:''}</div>
         <div>
           <div class="cal-drawer-title">${esc(e.title)}</div>
           ${e.description?`<div class="cal-drawer-desc">${esc(e.description)}</div>`:''}
@@ -1803,6 +1979,41 @@ function openDrawer(dateStr){
 }
 function closeDrawer(){
   document.getElementById('cal-drawer').classList.remove('open');
+}
+
+// ── Add event modal ──
+function openAddEventModal(dateStr){
+  const modal = document.getElementById('cal-modal-overlay');
+  // pre-fill date
+  const d = dateStr || (currentDrawerDate) || new Date().toISOString().split('T')[0];
+  document.getElementById('cme-date').value = d;
+  document.getElementById('cme-title').value = '';
+  document.getElementById('cme-time-start').value = '';
+  document.getElementById('cme-time-end').value = '';
+  document.getElementById('cme-desc').value = '';
+  document.getElementById('cme-err').textContent = '';
+  modal.classList.add('open');
+  setTimeout(()=>document.getElementById('cme-title').focus(), 100);
+}
+function closeAddEventModal(){
+  document.getElementById('cal-modal-overlay').classList.remove('open');
+}
+async function saveEventFromModal(){
+  const title = document.getElementById('cme-title').value.trim();
+  const date  = document.getElementById('cme-date').value;
+  const timeStart = document.getElementById('cme-time-start').value;
+  const timeEnd   = document.getElementById('cme-time-end').value;
+  const desc  = document.getElementById('cme-desc').value.trim();
+  const errEl = document.getElementById('cme-err');
+  errEl.textContent = '';
+  if(!title){ errEl.textContent = '⚠ Wpisz tytuł wydarzenia'; return; }
+  if(!date) { errEl.textContent = '⚠ Wybierz datę'; return; }
+  const id = await dbAdd('events',{title, date, time: timeStart, timeEnd, description: desc});
+  events.push({id, title, date, time: timeStart, timeEnd, description: desc, createdAt: new Date().toISOString()});
+  renderCalendar();
+  closeAddEventModal();
+  // open drawer for that day
+  openDrawer(date);
 }
 // ── Tasks filter state ──
 let taskFilter = 'all';
@@ -1885,7 +2096,7 @@ function taskCardHTML(t, today){
   return `<div class="task-card prio-${p} ${doneClass}" id="tcard-${t.id}">
     <button class="task-card-del" onclick="deleteItem('tasks',${t.id})">✕</button>
     <div class="task-card-row">
-      <input type="checkbox" class="task-card-cb" ${t.done?'checked':''} onchange="toggleTask(${t.id})">
+      <div class="task-toggle${t.done?' checked':''}" onclick="toggleTask(${t.id})"></div>
       <span class="task-card-title">${esc(t.title)}</span>
     </div>
     <div class="task-card-prio-row">${prioPills}${dueLabel?`<span style="margin-left:6px">${dueLabel}</span>`:''}</div>
