@@ -895,9 +895,9 @@ nav {
   position: fixed; inset: 0; z-index: 9000;
   background: rgba(0,0,0,.65); backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  display: none; align-items: flex-end; justify-content: center;
+  display: none; align-items: center; justify-content: center;
 }
-.cal-modal-overlay.open { display: flex; animation: slideUp .28s cubic-bezier(.32,1,.23,1); }
+.cal-modal-overlay.open { display: flex; animation: modalIn .2s ease; }
 @keyframes slideUp { from{transform:translateY(80px);opacity:0} to{transform:none;opacity:1} }
 .cal-modal {
   width: 100%; max-width: 560px;
@@ -1613,6 +1613,36 @@ nav { padding-bottom: max(var(--sab), 8px); }
 .cat-dot-praca     { background: #ff4d6d; }
 .cat-dot-wyjscia   { background: #00ffb3; }
 .cat-dot-obowiazki { background: #ff6eb4; }
+
+/* ── Add event modal category ── */
+.cme-cat-label {
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .22em;
+  color: var(--text3); margin: 4px 0 6px;
+}
+.cme-cat-row { display: flex; gap: 8px; margin-bottom: 4px; }
+.cme-cat-btn {
+  flex: 1; padding: 10px 6px; border-radius: 7px; cursor: pointer;
+  border: 1.5px solid rgba(255,255,255,.1); background: transparent;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .12em;
+  color: var(--text3); transition: all .18s; text-align: center;
+}
+.cme-cat-btn[data-cat="praca"]:hover,
+.cme-cat-btn.active[data-cat="praca"]     { border-color: #ff4d6d; color: #ff4d6d; background: rgba(255,77,109,.12); }
+.cme-cat-btn[data-cat="wyjscia"]:hover,
+.cme-cat-btn.active[data-cat="wyjscia"]   { border-color: #00ffb3; color: #00ffb3; background: rgba(0,255,179,.1); }
+.cme-cat-btn[data-cat="obowiazki"]:hover,
+.cme-cat-btn.active[data-cat="obowiazki"] { border-color: #ff6eb4; color: #ff6eb4; background: rgba(255,110,180,.12); }
+.cme-cat-btn.active { font-weight: 700; }
+
+.cal-add-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(0,229,255,.12); border: 1.5px solid rgba(0,229,255,.5);
+  color: var(--c); font-size: 22px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .18s; box-shadow: 0 0 18px rgba(0,229,255,.2);
+}
+.cal-add-btn:hover { background: rgba(0,229,255,.22); box-shadow: 0 0 28px rgba(0,229,255,.4); transform: scale(1.08); }
+.cal-add-btn:active { transform: scale(.94); }
 </style>
 </head>
 <body>
@@ -1783,6 +1813,12 @@ nav { padding-bottom: max(var(--sab), 8px); }
           </div>
         </div>
         <textarea class="cal-modal-input cal-modal-textarea" id="cme-desc" placeholder="Opis (opcjonalnie)..."></textarea>
+        <div class="cme-cat-label">KATEGORIA</div>
+        <div class="cme-cat-row">
+          <button class="cme-cat-btn" data-cat="praca"     onclick="selectAddCat(this)">💼 PRACA</button>
+          <button class="cme-cat-btn" data-cat="wyjscia"   onclick="selectAddCat(this)">🚶 WYJŚCIA</button>
+          <button class="cme-cat-btn" data-cat="obowiazki" onclick="selectAddCat(this)">📋 OBOWIĄZKI</button>
+        </div>
         <button class="cal-modal-save-btn" onclick="saveEventFromModal()">DODAJ WYDARZENIE ▶</button>
         <div class="cal-modal-err" id="cme-err"></div>
       </div>
@@ -2539,6 +2575,7 @@ function openAddEventModal(dateStr){
   document.getElementById('cme-time-end').value = '';
   document.getElementById('cme-desc').value = '';
   document.getElementById('cme-err').textContent = '';
+  document.querySelectorAll('.cme-cat-btn').forEach(b=>b.classList.remove('active'));
   modal.classList.add('open');
   setTimeout(()=>document.getElementById('cme-title').focus(), 100);
 }
@@ -2555,8 +2592,10 @@ async function saveEventFromModal(){
   errEl.textContent = '';
   if(!title){ errEl.textContent = '⚠ Wpisz tytuł wydarzenia'; return; }
   if(!date) { errEl.textContent = '⚠ Wybierz datę'; return; }
-  const id = await dbAdd('events',{title, date, time: timeStart, timeEnd, description: desc});
-  events.push({id, title, date, time: timeStart, timeEnd, description: desc, createdAt: new Date().toISOString()});
+  const activeAddCat = document.querySelector('.cme-cat-btn.active');
+  const category = activeAddCat ? activeAddCat.dataset.cat : '';
+  const id = await dbAdd('events',{title, date, time: timeStart, timeEnd, description: desc, category});
+  events.push({id, title, date, time: timeStart, timeEnd, description: desc, category, createdAt: new Date().toISOString()});
   renderCalendar();
   closeAddEventModal();
   // open drawer for that day
@@ -3074,6 +3113,12 @@ function selectCat(btn){
   if(btn._wasActive){ btn._wasActive=false; return; }
   btn.classList.add('active');
   document.querySelectorAll('.ef-cat-btn').forEach(b=>{ b._wasActive = b===btn && b.classList.contains('active'); });
+}
+
+function selectAddCat(btn){
+  const wasActive = btn.classList.contains('active');
+  document.querySelectorAll('.cme-cat-btn').forEach(b=>b.classList.remove('active'));
+  if(!wasActive) btn.classList.add('active');
 }
 </script>
 <script>
