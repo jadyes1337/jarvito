@@ -809,13 +809,7 @@ nav {
 }
 
 /* ── Task add form ── */
-.tasks-add-form {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(4,8,12,.97);
-  flex-shrink: 0;
-  display: flex; flex-direction: column; gap: 7px;
-}
+
 .tasks-add-title-row { display: none; }
 .tasks-add-row { display: flex; gap: 8px; align-items: center; }
 .tasks-add-input {
@@ -989,7 +983,6 @@ nav {
 /* ── Notes layout ── */
 .notes-layout {
   display: flex; flex-direction: column; flex: 1; overflow: hidden;
-  position: relative;
 }
 
 /* ── Notes list view ── */
@@ -1045,11 +1038,6 @@ nav {
   display: flex; align-items: center; gap: 10px;
 }
 .note-item:active { background: rgba(0,229,255,.06); }
-/* iOS: immediate visual feedback on tap */
-.nav-btn:active { opacity: .6; transform: scale(.96); }
-.report-btn:active { transform: scale(.97); opacity: .8; }
-.cal-nav-btn:active { background: rgba(0,229,255,.28); }
-.notes-new-btn:active { transform: scale(.9); }
 .note-item.active { background: rgba(0,229,255,.07); }
 
 .note-item-body { flex: 1; min-width: 0; }
@@ -1229,13 +1217,6 @@ nav {
   font-family: var(--font-mono); font-size: 9px; color: var(--text3); letter-spacing: .1em;
 }
 .task-card-due.overdue { color: var(--r); }
-.task-card-del {
-  position: absolute; top: 10px; right: 10px;
-  background: transparent; border: none;
-  color: rgba(255,77,109,.2); cursor: pointer; font-size: 13px;
-  padding: 3px 6px; border-radius: 3px; transition: all .15s;
-}
-.task-card-del:hover { color: var(--r); background: rgba(255,77,109,.08); }
 .tasks-section-label {
   font-family: var(--font-mono); font-size: 9px; letter-spacing: .3em;
   color: var(--text3); padding: 14px 4px 8px; border-bottom: 1px solid var(--border);
@@ -1243,747 +1224,395 @@ nav {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   iPhone 16 — Dedicated Optimizations
-   Screen: 393×852 pt / 1179×2556 px / 460 ppi
-   Dynamic Island: 37×12 mm centered at top
-   Safe areas: top ~59px, bottom ~34px (home indicator)
+   iPhone 16 optimizations
    ═══════════════════════════════════════════════════════════════ */
-
-/* ── iPhone 16 safe area variables ── */
 :root {
   --sat: env(safe-area-inset-top, 59px);
   --sab: env(safe-area-inset-bottom, 34px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
 }
-
-/* ── Prevent iOS rubber-band on root ── */
 html { overflow: hidden; position: fixed; width: 100%; }
 body { overflow: hidden; position: fixed; width: 100%; height: 100%; }
+#app { height: 100dvh; padding-left: var(--sal); padding-right: var(--sar); }
 
-/* ── Main layout: full dynamic viewport ── */
-#app {
-  height: 100dvh;
-  /* Offset left/right for rotated use too */
-  padding-left: var(--sal);
-  padding-right: var(--sar);
-}
-
-/* ── Header: respect Dynamic Island ── */
 header {
   padding-top: max(var(--sat), 14px);
-  /* taller header to clear Dynamic Island (iPhone 16 island is ~37px + 12px gap) */
   height: calc(58px + max(var(--sat), 14px));
   padding-left: max(16px, var(--sal));
   padding-right: max(16px, var(--sar));
+  position: relative;
 }
-
-/* Dynamic Island safe glow — avoid placing content in island zone */
 header::before {
   content: '';
   position: absolute;
   top: 0; left: 50%; transform: translateX(-50%);
-  width: 126px; /* iPhone 16 island width */
+  width: 126px;
   height: max(var(--sat), 14px);
-  background: rgba(0,0,0,.95); /* matches Dynamic Island pill */
+  background: rgba(0,0,0,.95);
   border-radius: 0 0 20px 20px;
   z-index: 1;
   pointer-events: none;
 }
-
-/* ── Bottom nav: home indicator clearance ── */
-nav {
-  padding-bottom: max(var(--sab), 8px);
-  /* slightly taller touch targets on iPhone 16 */
-}
-
-.nav-btn {
-  /* Apple HIG: 44pt minimum, we give 54pt for comfort */
-  min-height: 54px;
-  padding: 10px 4px max(8px, calc(var(--sab) * 0.25));
-  /* Bigger icons on ProMax/16 screens */
-  gap: 4px;
-}
-.nav-btn .nav-icon { font-size: 22px; }
-.nav-btn .nav-label { font-size: 10px; letter-spacing: .04em; }
-
-/* ── Input bar: sits above home indicator ── */
+nav { padding-bottom: max(var(--sab), 8px); }
+.nav-btn { min-height: 54px; padding: 10px 4px; }
 .input-bar {
   padding-left: max(12px, var(--sal));
   padding-right: max(12px, var(--sar));
-  /* When keyboard is open iOS adjusts viewport, safe area returns to 0 — fine */
   padding-bottom: max(12px, calc(var(--sab) * 0.5));
-  /* Extra breathing room */
-  gap: 10px;
 }
-
-/* ── Input field: 16px mandatory (prevents zoom on iOS) ── */
-#msg-input {
-  font-size: 16px !important;
-  /* pill shape fits iPhone aesthetic */
-  border-radius: 22px;
-  padding: 12px 18px;
-  /* allow up to 3 lines before scrolling */
-  max-height: 80px;
-}
-
-/* ── Buttons: 44pt minimum touch target ── */
-#send-btn, #mic-btn {
-  width: 48px;
-  height: 48px;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-/* ── Chat: smooth momentum scroll ── */
-#chat-messages {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  padding: 16px 16px 12px;
-  /* Account for input bar + bottom nav */
-}
-
-/* ── Message bubbles: slightly wider on 393pt screen ── */
+#msg-input { font-size: 16px !important; border-radius: 22px; padding: 12px 18px; }
+#send-btn, #mic-btn { width: 48px; height: 48px; min-width: 44px; min-height: 44px; border-radius: 50%; flex-shrink: 0; }
+#chat-messages { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
 .bubble-wrap { max-width: 84%; }
-.bubble {
-  font-size: 16px; /* readable on Retina */
-  line-height: 1.55;
-  border-radius: 4px 18px 18px 18px;
-}
-.msg.user .bubble { border-radius: 18px 4px 18px 18px; }
+.bubble { font-size: 16px; line-height: 1.55; }
 
-/* ── Avatar: slightly larger ── */
-.avatar { width: 32px; height: 32px; font-size: 12px; }
-
-/* ── Notes: full-screen editor on iPhone ── */
-.notes-editor-view {
-  /* Slide in from right — native iOS feel */
-  transform: translateX(100%);
-  transition: transform .3s cubic-bezier(.32,1,.23,1);
-  position: absolute; inset: 0; z-index: 10;
-  background: var(--bg);
-}
-.notes-editor-view.visible {
-  transform: translateX(0);
-}
-.notes-list-view {
-  transition: transform .3s cubic-bezier(.32,1,.23,1);
-}
-.notes-list-view.hidden {
-  transform: translateX(-40px);
-}
-
-/* ── Notes editor: larger touch targets ── */
-.notes-back-btn {
-  font-size: 16px;
-  padding: 8px 14px 8px 4px;
-  min-height: 44px;
-}
-.notes-del-btn {
-  min-width: 44px;
-  min-height: 44px;
-  font-size: 20px;
-}
-.notes-body-input {
-  font-size: 16px;
-  padding: 18px 20px;
-  padding-bottom: max(20px, var(--sab));
-}
-.notes-title-input { font-size: 17px; font-weight: 700; }
-
-/* ── Calendar: larger tap targets ── */
-.cal-nav-btn {
-  width: 36px; height: 36px;
-  min-width: 44px; min-height: 44px;
-}
-.cal-add-btn {
-  width: 40px; height: 40px;
-  min-width: 44px; min-height: 44px;
-}
-.cal-cell { min-height: 68px; }
-
-/* ── Modal: slides from bottom, full width on iPhone ── */
-.cal-modal {
-  border-radius: 24px 24px 0 0;
-  padding-bottom: max(env(safe-area-inset-bottom), 20px);
-}
-.cal-modal-input {
-  font-size: 16px !important; /* prevent zoom */
-  border-radius: 12px;
-  padding: 13px 16px;
-}
-.cal-modal-save-btn {
-  border-radius: 14px;
-  padding: 16px;
-  font-size: 13px;
-}
-
-/* ── API Key overlay: keyboard-aware ── */
-.apikey-box {
-  padding: 36px 28px;
-  /* lower on screen so keyboard doesn't cover it */
-  margin-bottom: calc(max(var(--sab), 20px) + 20px);
-  border-radius: 16px;
-}
-#apikey-input {
-  font-size: 16px !important;
-  padding: 14px 16px;
-  border-radius: 10px;
-}
-#apikey-save {
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 12px;
-}
-
-/* ── Task add form ── */
-.tasks-add-input {
-  font-size: 16px !important;
-  border-radius: 14px;
-  padding: 13px 16px;
-}
-.tasks-add-btn {
-  width: 46px;
-  height: 46px;
-  min-width: 44px;
-  border-radius: 14px;
-}
-
-/* ── Drawer: safe area bottom ── */
-.cal-drawer {
-  padding-bottom: max(var(--sab), 20px);
-  border-radius: 20px 20px 0 0;
-}
-
-/* ── Delete buttons: bigger tap area ── */
-.del-btn, .cal-drawer-del, .note-item-del {
-  min-width: 44px; min-height: 44px;
-  display: flex; align-items: center; justify-content: center;
-}
-
-/* ── Task toggle (checkbox replacement): bigger ── */
-.task-toggle {
-  width: 28px; height: 28px;
-  min-width: 44px; min-height: 44px;
-  /* extend tap area without changing visual size */
-  padding: 8px;
-  box-sizing: content-box;
-  margin: -8px;
-  margin-right: 2px;
-}
-
-/* ── Status bar text: slightly larger ── */
-.status-text { font-size: 10px; }
-
-/* ── Scrollable lists: hide scrollbars (iOS style) ── */
-.notes-list-inner,
-#chat-messages,
-.cal-body,
-.data-scroll,
-#tasks-scroll,
-.cal-week-body,
-.cal-day-body {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.notes-list-inner::-webkit-scrollbar,
-#chat-messages::-webkit-scrollbar,
-.cal-body::-webkit-scrollbar,
-.data-scroll::-webkit-scrollbar,
-#tasks-scroll::-webkit-scrollbar { display: none; }
-
-/* ── Stat boxes: adjust for narrow screen ── */
 @media (max-width: 430px) {
-  .report-grid { grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .report-grid { gap: 8px; }
   .stat-num { font-size: 26px; }
   .stat-box { padding: 14px 8px; }
-  .stat-lbl { font-size: 7px; letter-spacing: .15em; }
-
-  /* Calendar: compact toolbar */
-  .cal-period-label { font-size: 10px; min-width: 100px; }
-  .cal-seg-btn { padding: 5px 8px; font-size: 7px; }
-
-  /* Logo: tighter on narrow */
   .logo-title { font-size: 14px; letter-spacing: .2em; }
-  .logo-sub { font-size: 7px; }
   .logo-ring { width: 32px; height: 32px; font-size: 13px; }
-
-  /* Nav badges: reposition */
-  .nav-btn .cnt { right: calc(50% - 20px); }
 }
-
-/* ── iPhone 16 Pro / 16 Pro Max (430pt wide) ── */
-@media (min-width: 430px) {
-  .bubble-wrap { max-width: 80%; }
-  .bubble { font-size: 16px; }
-  header {
-    /* Pro Max: island same size, more padding */
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-}
-
-/* ── Reduce motion (accessibility) ── */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
-  }
-}
-
-/* ── Dark mode colors already set, but make sure ── */
-@media (prefers-color-scheme: dark) {
-  .cal-modal-input, .tasks-add-input, #msg-input, #apikey-input {
-    color-scheme: dark;
-  }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
 
-/* ═══════════════════════════════════════════════
-   TASKS — New Layout
-   ═══════════════════════════════════════════════ */
+/* ════════════════════════════════════════
+   TASKS — complete layout
+   ════════════════════════════════════════ */
 
-/* ── Top bar: filters + FAB + progress ── */
-.tasks-topbar {
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border);
-  background: rgba(7,14,20,.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
+/* Topbar */
+.tasks-topbar { flex-shrink:0; border-bottom:1px solid var(--border); background:rgba(7,14,20,.92); backdrop-filter:blur(16px); }
+.tasks-filters-row { display:flex; align-items:center; justify-content:space-between; padding:10px 14px 8px; gap:10px; }
+.tasks-filters { display:flex; gap:3px; flex:1; }
+.task-filter-btn { flex:1; padding:8px 6px; border:1px solid var(--border); border-radius:8px; background:transparent; color:var(--text3); font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; cursor:pointer; transition:all .18s; text-align:center; }
+.task-filter-btn:active { opacity:.7; }
+.task-filter-btn.active { background:rgba(0,229,255,.13); border-color:rgba(0,229,255,.45); color:var(--c); }
 
-.tasks-filters-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px 8px;
-  gap: 10px;
-}
+/* FAB */
+.tasks-fab { width:42px; height:42px; min-width:44px; min-height:44px; border-radius:50%; background:var(--c); border:none; color:var(--bg); font-size:24px; font-weight:300; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 0 24px rgba(0,229,255,.45),0 4px 16px rgba(0,0,0,.4); transition:all .2s; }
+.tasks-fab:active { transform:scale(.9); box-shadow:0 0 14px rgba(0,229,255,.3); }
 
-.tasks-filters {
-  display: flex;
-  gap: 3px;
-  flex: 1;
-}
+/* Progress */
+.tasks-progress-bar-wrap { height:3px; background:rgba(0,229,255,.07); }
+.tasks-progress-bar { height:100%; background:linear-gradient(90deg,var(--g),var(--c)); transition:width .5s cubic-bezier(.4,0,.2,1); border-radius:0 2px 2px 0; }
+.tasks-progress-stats { padding:6px 12px 8px; font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; color:var(--text3); display:flex; align-items:center; gap:6px; }
 
-.task-filter-btn {
-  flex: 1;
-  padding: 8px 6px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text3);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .1em;
-  cursor: pointer;
-  transition: all .18s;
-  text-align: center;
-}
-.task-filter-btn:active { opacity: .7; }
-.task-filter-btn.active {
-  background: rgba(0,229,255,.13);
-  border-color: rgba(0,229,255,.45);
-  color: var(--c);
-}
+/* Priority filter pills */
+.prio-filter-pill { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:20px; border:1px solid transparent; cursor:pointer; font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; font-weight:700; background:transparent; color:var(--text3); transition:all .18s; min-height:32px; }
+.prio-filter-pill:active { transform:scale(.92); }
+.prio-filter-pill .pill-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; transition:transform .18s; }
+.prio-filter-pill.active .pill-dot { transform:scale(1.25); }
+.prio-filter-pill.pill-all  .pill-dot { background:conic-gradient(var(--r) 0deg 120deg,var(--y) 120deg 240deg,var(--g) 240deg 360deg); }
+.prio-filter-pill.pill-high   .pill-dot { background:var(--r); box-shadow:0 0 6px rgba(255,77,109,.5); }
+.prio-filter-pill.pill-medium .pill-dot { background:var(--y); box-shadow:0 0 6px rgba(255,209,102,.5); }
+.prio-filter-pill.pill-low    .pill-dot { background:var(--g); box-shadow:0 0 6px rgba(0,255,179,.5); }
+.prio-filter-pill.pill-all.active    { background:rgba(0,229,255,.08); border-color:rgba(0,229,255,.35); color:var(--c); }
+.prio-filter-pill.pill-high.active   { background:rgba(255,77,109,.12); border-color:rgba(255,77,109,.45); color:var(--r); }
+.prio-filter-pill.pill-medium.active { background:rgba(255,209,102,.1); border-color:rgba(255,209,102,.45); color:var(--y); }
+.prio-filter-pill.pill-low.active    { background:rgba(0,255,179,.08); border-color:rgba(0,255,179,.4); color:var(--g); }
 
-/* FAB — floating add button */
-.tasks-fab {
-  width: 42px; height: 42px;
-  min-width: 44px; min-height: 44px;
-  border-radius: 50%;
-  background: var(--c);
-  border: none;
-  color: var(--bg);
-  font-size: 24px;
-  font-weight: 300;
-  line-height: 1;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 0 24px rgba(0,229,255,.45), 0 4px 16px rgba(0,0,0,.4);
-  transition: all .2s;
-}
-.tasks-fab:active {
-  transform: scale(.9);
-  box-shadow: 0 0 14px rgba(0,229,255,.3);
-}
-
-/* Progress bar inside topbar */
-.tasks-progress-bar-wrap {
-  height: 3px;
-  background: rgba(0,229,255,.07);
-  margin: 0;
-}
-.tasks-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--g), var(--c));
-  transition: width .5s cubic-bezier(.4,0,.2,1);
-  border-radius: 0 2px 2px 0;
-}
-.tasks-progress-stats {
-  padding: 6px 12px 8px;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .1em;
-  color: var(--text3);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.tasks-progress-label { display: none; }
-
-/* ── Priority filter pills in stats bar ── */
-.prio-filter-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 11px;
-  border-radius: 20px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .1em;
-  font-weight: 700;
-  background: transparent;
-  color: var(--text3);
-  transition: all .18s;
-  -webkit-tap-highlight-color: transparent;
-  min-height: 32px;
-  min-width: 44px;
-}
-.prio-filter-pill:active { transform: scale(.92); }
-
-.prio-filter-pill .pill-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  transition: transform .18s;
-}
-.prio-filter-pill.active .pill-dot { transform: scale(1.25); }
-
-/* Red / high */
-.prio-filter-pill.pill-high .pill-dot { background: var(--r); box-shadow: 0 0 6px rgba(255,77,109,.5); }
-.prio-filter-pill.pill-high.active {
-  background: rgba(255,77,109,.12);
-  border-color: rgba(255,77,109,.45);
-  color: var(--r);
-  box-shadow: 0 0 12px rgba(255,77,109,.15);
-}
-/* Yellow / medium */
-.prio-filter-pill.pill-medium .pill-dot { background: var(--y); box-shadow: 0 0 6px rgba(255,209,102,.5); }
-.prio-filter-pill.pill-medium.active {
-  background: rgba(255,209,102,.1);
-  border-color: rgba(255,209,102,.45);
-  color: var(--y);
-  box-shadow: 0 0 12px rgba(255,209,102,.12);
-}
-/* Green / low */
-.prio-filter-pill.pill-low .pill-dot { background: var(--g); box-shadow: 0 0 6px rgba(0,255,179,.5); }
-.prio-filter-pill.pill-low.active {
-  background: rgba(0,255,179,.08);
-  border-color: rgba(0,255,179,.4);
-  color: var(--g);
-  box-shadow: 0 0 12px rgba(0,255,179,.1);
-}
-/* All / reset pill */
-.prio-filter-pill.pill-all .pill-dot {
-  background: conic-gradient(var(--r) 0deg 120deg, var(--y) 120deg 240deg, var(--g) 240deg 360deg);
-  box-shadow: 0 0 6px rgba(0,229,255,.3);
-}
-.prio-filter-pill.pill-all.active {
-  background: rgba(0,229,255,.08);
-  border-color: rgba(0,229,255,.35);
-  color: var(--c);
-}
-
-/* ── Task cards — redesigned ── */
+/* ── Task card — two-column layout ── */
 .task-card {
-  background: rgba(11,21,32,.75);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 14px 12px;
-  margin-bottom: 10px;
   position: relative;
-  transition: all .2s;
-  animation: msgIn .22s ease;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(8,16,24,.85);
+  margin-bottom: 8px;
   overflow: hidden;
+  padding: 0;
 }
 .task-card::before {
   content: '';
-  position: absolute; left: 0; top: 0; bottom: 0;
-  width: 3px; border-radius: 3px 0 0 3px;
-  background: var(--text3);
-  transition: background .2s;
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: 14px 0 0 14px;
+  z-index: 2;
+  pointer-events: none;
 }
 .task-card.prio-high::before   { background: var(--r); }
 .task-card.prio-medium::before { background: var(--y); }
 .task-card.prio-low::before    { background: var(--g); }
-.task-card.done-card {
-  opacity: .48;
-  background: rgba(11,21,32,.4);
-}
-.task-card.done-card::before { background: var(--text3) !important; }
-.task-card.done-card .task-card-title { text-decoration: line-through; }
+.task-card.done-card::before   { background: rgba(255,255,255,.08); }
 
-.task-card-row { display: flex; align-items: flex-start; gap: 12px; }
-
-/* Custom circular checkbox */
-.task-toggle {
-  width: 24px; height: 24px;
-  border-radius: 50%; flex-shrink: 0; cursor: pointer;
-  border: 2px solid rgba(0,229,255,.35);
-  background: transparent;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .2s; margin-top: 1px;
-  padding: 0; box-sizing: border-box;
-  /* large tap zone */
-  min-width: 44px; min-height: 44px;
-  margin: -10px; padding: 10px;
-  box-sizing: content-box;
-}
-.task-toggle::after {
-  content: ''; width: 10px; height: 10px; border-radius: 50%;
-  background: var(--c); opacity: 0; transform: scale(0);
-  transition: all .2s;
-}
-.task-toggle.checked { border-color: var(--g); background: rgba(0,255,179,.1); }
-.task-toggle.checked::after { background: var(--g); opacity: 1; transform: scale(1); }
-
-.task-card-title {
-  font-size: 15px; font-weight: 500; color: var(--text);
-  flex: 1; line-height: 1.4; padding-top: 2px;
-}
-
-/* Meta row: difficulty chip + date + time */
-.task-card-meta-row {
-  display: flex; align-items: center; flex-wrap: wrap;
-  gap: 6px; margin-top: 8px; padding-left: 44px;
-}
-.task-diff-chip {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 2px 9px; border-radius: 20px;
-  font-family: var(--font-mono); font-size: 8px; letter-spacing: .12em;
-  font-weight: 700;
-}
-.diff-low    { color: var(--g); background: rgba(0,255,179,.1);  border: 1px solid rgba(0,255,179,.25);  }
-.diff-medium { color: var(--y); background: rgba(255,209,102,.1); border: 1px solid rgba(255,209,102,.3); }
-.diff-high   { color: var(--r); background: rgba(255,77,109,.1);  border: 1px solid rgba(255,77,109,.3);  }
-
-.task-card-due {
-  font-family: var(--font-mono); font-size: 9px;
-  color: var(--text3); letter-spacing: .08em;
-  display: flex; align-items: center; gap: 3px;
-}
-.task-card-due.overdue { color: var(--r); }
-.task-card-note {
-  font-size: 12px; color: var(--text2); margin-top: 6px;
-  padding-left: 44px; line-height: 1.5; opacity: .75;
-}
-.task-card-del {
-  position: absolute; top: 10px; right: 10px;
-  background: transparent; border: none;
-  color: rgba(255,77,109,.22); cursor: pointer;
-  font-size: 14px; padding: 4px 8px;
-  border-radius: 6px; transition: all .15s;
-  min-width: 36px; min-height: 36px;
-  display: flex; align-items: center; justify-content: center;
-}
-.task-card-del:active { color: var(--r); background: rgba(255,77,109,.1); }
-
-/* Section labels */
-.tasks-section-label {
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: .3em;
-  color: var(--text3); padding: 12px 2px 8px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
-  display: flex; align-items: center; gap: 8px;
-}
-.tasks-section-label::after {
-  content: ''; flex: 1; height: 1px;
-  background: linear-gradient(90deg, var(--border), transparent);
-}
-
-/* ── Task Add/Edit Modal ── */
-.task-modal-overlay {
-  position: fixed; inset: 0; z-index: 9500;
-  background: rgba(0,0,0,.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  display: none; align-items: flex-end; justify-content: center;
-}
-.task-modal-overlay.open {
+.task-card-inner {
   display: flex;
-  animation: slideUp .3s cubic-bezier(.32,1,.23,1);
-}
-
-.task-modal {
-  width: 100%; max-width: 560px;
-  background: rgba(7,14,20,.99);
-  border: 1px solid rgba(0,229,255,.25);
-  border-top: 1px solid rgba(0,229,255,.4);
-  border-radius: 24px 24px 0 0;
-  overflow: hidden;
-  padding-bottom: max(env(safe-area-inset-bottom,20px), 20px);
-  max-height: 92dvh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.task-modal-hdr {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 20px 14px;
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 0;
-  background: rgba(7,14,20,.99);
-  backdrop-filter: blur(12px);
-  z-index: 2;
-}
-/* drag handle */
-.task-modal-hdr::before {
-  content: '';
-  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-  width: 36px; height: 4px; border-radius: 2px;
-  background: rgba(0,229,255,.2);
-}
-.task-modal-title {
-  font-family: var(--font-mono); font-size: 11px;
-  letter-spacing: .25em; color: var(--c);
-}
-.task-modal-close {
-  background: transparent; border: none;
-  color: var(--text3); font-size: 18px; cursor: pointer;
-  min-width: 44px; min-height: 44px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 10px; transition: all .15s;
-}
-.task-modal-close:active { background: rgba(255,77,109,.1); color: var(--r); }
-
-.task-modal-body {
-  padding: 16px 20px 10px;
-  display: flex; flex-direction: column; gap: 16px;
-}
-
-.tm-field { display: flex; flex-direction: column; gap: 6px; }
-.tm-field-half { flex: 1; }
-.tm-row { display: flex; gap: 12px; }
-
-.tm-label {
-  font-family: var(--font-mono); font-size: 8px;
-  letter-spacing: .22em; color: var(--text3);
-  padding-left: 2px;
-}
-
-.tm-input {
-  background: rgba(0,229,255,.05);
-  border: 1px solid rgba(0,229,255,.18);
-  border-radius: 12px;
-  padding: 13px 15px;
-  color: var(--text);
-  font-family: var(--font-body); font-size: 16px;
-  outline: none; transition: border-color .2s, box-shadow .2s;
-  -webkit-appearance: none; color-scheme: dark;
-  width: 100%;
-}
-.tm-input:focus {
-  border-color: rgba(0,229,255,.5);
-  box-shadow: 0 0 16px rgba(0,229,255,.08);
-}
-.tm-input::placeholder { color: var(--text3); }
-.tm-textarea { resize: none; height: 72px; font-size: 15px; }
-
-/* Difficulty selector */
-.tm-difficulty {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;
-}
-.tm-diff-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 12px 8px;
-  background: rgba(0,229,255,.04);
-  border: 1.5px solid var(--border);
-  border-radius: 12px; cursor: pointer;
-  transition: all .18s; font-family: var(--font-body);
-  min-height: 70px;
-}
-.tm-diff-btn:active { transform: scale(.96); }
-.tm-diff-icon { font-size: 22px; line-height: 1; }
-.tm-diff-name {
-  font-family: var(--font-mono); font-size: 8px;
-  letter-spacing: .18em; color: var(--text3);
-  transition: color .18s;
-}
-.tm-diff-btn[data-p="low"].active {
-  background: rgba(0,255,179,.1); border-color: rgba(0,255,179,.5);
-}
-.tm-diff-btn[data-p="low"].active .tm-diff-name { color: var(--g); }
-.tm-diff-btn[data-p="medium"].active {
-  background: rgba(255,209,102,.1); border-color: rgba(255,209,102,.5);
-}
-.tm-diff-btn[data-p="medium"].active .tm-diff-name { color: var(--y); }
-.tm-diff-btn[data-p="high"].active {
-  background: rgba(255,77,109,.1); border-color: rgba(255,77,109,.5);
-}
-.tm-diff-btn[data-p="high"].active .tm-diff-name { color: var(--r); }
-
-.tm-err {
-  font-family: var(--font-mono); font-size: 10px;
-  color: var(--r); text-align: center; min-height: 16px;
-  letter-spacing: .1em;
-}
-
-.tm-save-btn {
-  width: 100%; padding: 16px;
-  background: rgba(0,229,255,.14);
-  border: 1px solid rgba(0,229,255,.45);
-  border-radius: 14px; color: var(--c);
-  font-family: var(--font-mono); font-size: 11px;
-  letter-spacing: .22em; cursor: pointer;
-  transition: all .2s; margin-top: 4px;
-  font-weight: 700;
-}
-.tm-save-btn:active { background: rgba(0,229,255,.28); transform: scale(.99); }
-
-
-/* ── Difficulty chip — clickable/cyclable on card ── */
-.diff-btn-cycle {
+  flex-direction: row;
+  align-items: center;
+  min-height: 62px;
   cursor: pointer;
-  border: none;
-  font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: .12em;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 20px;
-  display: inline-flex;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  padding: 12px 96px 12px 14px;
+  gap: 12px;
+}
+.task-card-inner:active { opacity: .75; }
+
+/* Left col — just the toggle */
+.task-toggle-col {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Circle toggle — smaller */
+.task-toggle {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  background: transparent;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+  position: relative;
+}
+.task-card.prio-high   .task-toggle { color: var(--r); box-shadow: 0 0 6px rgba(255,77,109,.2); }
+.task-card.prio-medium .task-toggle { color: var(--y); box-shadow: 0 0 6px rgba(255,209,102,.15); }
+.task-card.prio-low    .task-toggle { color: var(--g); box-shadow: 0 0 6px rgba(0,255,179,.15); }
+.task-card.done-card   .task-toggle { color: rgba(255,255,255,.2); box-shadow: none; }
+.task-toggle::after {
+  content: '';
+  position: absolute;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--g);
+  opacity: 0;
+  transform: scale(0);
+  transition: all .22s cubic-bezier(.34,1.56,.64,1);
+}
+.task-toggle.checked { background: rgba(0,255,179,.1); color: var(--g); box-shadow: 0 0 10px rgba(0,255,179,.3); }
+.task-toggle.checked::after { opacity: 1; transform: scale(1); }
+
+/* Right col */
+.task-card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+.task-card-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.task-card.done-card .task-card-title { text-decoration: line-through; opacity: .38; }
+.task-card-meta-row { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+
+/* Actions container — pill po prawej, flex row */
+.task-card-actions {
+  position: absolute;
+  top: 50%; right: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 4px;
-  transition: all .18s;
-  -webkit-tap-highlight-color: transparent;
-  position: relative;
-  overflow: hidden;
+  background: rgba(4,10,18,.8);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  padding: 4px;
 }
-.diff-btn-cycle::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: rgba(255,255,255,0);
+.task-card-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  color: rgba(0,229,255,.8);
+  font-size: 15px;
+  cursor: pointer;
   transition: background .15s;
+  flex-shrink: 0;
+  position: static;
 }
-.diff-btn-cycle:active::after {
-  background: rgba(255,255,255,.12);
+.task-card-edit:active { background: rgba(0,229,255,.15); }
+.task-card-del {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  color: rgba(255,77,109,.75);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .15s;
+  flex-shrink: 0;
+  position: static;
 }
-.diff-btn-cycle:active {
-  transform: scale(.94);
-}
-/* tooltip hint on first render */
-.diff-btn-cycle .edit-hint {
-  font-size: 7px;
-  opacity: .55;
-  margin-left: 1px;
-}
+.task-card-del:active { background: rgba(255,77,109,.15); }
 
+/* Section labels */
+.tasks-section-label { font-family:var(--font-mono); font-size:9px; letter-spacing:.3em; color:var(--text3); padding:12px 2px 8px; border-bottom:1px solid var(--border); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.tasks-section-label::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+
+/* Diff chip — clickable */
+.task-diff-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-family:var(--font-mono); font-size:8px; letter-spacing:.12em; font-weight:700; cursor:pointer; border:none; transition:all .18s; -webkit-tap-highlight-color:transparent; }
+.task-diff-chip:active { transform:scale(.93); }
+.diff-low    { color:var(--g); background:rgba(0,255,179,.1);   border:1px solid rgba(0,255,179,.25); }
+.diff-medium { color:var(--y); background:rgba(255,209,102,.1); border:1px solid rgba(255,209,102,.3); }
+.diff-high   { color:var(--r); background:rgba(255,77,109,.1);  border:1px solid rgba(255,77,109,.3); }
+
+.task-card-due { font-family:var(--font-mono); font-size:9px; color:var(--text3); letter-spacing:.08em; display:flex; align-items:center; gap:3px; }
+.task-card-due.overdue { color:var(--r); }
+
+/* Modal */
+.task-modal-overlay { position:fixed; inset:0; z-index:9500; background:rgba(0,0,0,.6); backdrop-filter:blur(10px); display:none; align-items:flex-end; justify-content:center; }
+.task-modal-overlay.open { display:flex; animation:slideUp .3s cubic-bezier(.32,1,.23,1); }
+.task-modal { width:100%; max-width:560px; background:rgba(7,14,20,.99); border:1px solid rgba(0,229,255,.25); border-top:1px solid rgba(0,229,255,.4); border-radius:24px 24px 0 0; overflow:hidden; padding-bottom:max(env(safe-area-inset-bottom,20px),20px); max-height:92dvh; overflow-y:auto; }
+.task-modal-hdr { display:flex; align-items:center; justify-content:space-between; padding:18px 20px 14px; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(7,14,20,.99); z-index:2; }
+.task-modal-hdr::before { content:''; position:absolute; top:8px; left:50%; transform:translateX(-50%); width:36px; height:4px; border-radius:2px; background:rgba(0,229,255,.2); }
+.task-modal-title { font-family:var(--font-mono); font-size:11px; letter-spacing:.25em; color:var(--c); }
+.task-modal-close { background:transparent; border:none; color:var(--text3); font-size:18px; cursor:pointer; min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; transition:all .15s; }
+.task-modal-close:active { background:rgba(255,77,109,.1); color:var(--r); }
+.task-modal-body { padding:16px 20px 10px; display:flex; flex-direction:column; gap:16px; }
+.tm-field { display:flex; flex-direction:column; gap:6px; }
+.tm-field-half { flex:1; }
+.tm-row { display:flex; gap:12px; }
+.tm-label { font-family:var(--font-mono); font-size:8px; letter-spacing:.22em; color:var(--text3); padding-left:2px; }
+.tm-input { background:rgba(0,229,255,.05); border:1px solid rgba(0,229,255,.18); border-radius:12px; padding:13px 15px; color:var(--text); font-family:var(--font-body); font-size:16px; outline:none; transition:border-color .2s,box-shadow .2s; -webkit-appearance:none; color-scheme:dark; width:100%; }
+.tm-input:focus { border-color:rgba(0,229,255,.5); box-shadow:0 0 16px rgba(0,229,255,.08); }
+.tm-input::placeholder { color:var(--text3); }
+.tm-difficulty { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.tm-diff-btn { display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 8px; background:rgba(0,229,255,.04); border:1.5px solid var(--border); border-radius:12px; cursor:pointer; transition:all .18s; font-family:var(--font-body); min-height:70px; }
+.tm-diff-btn:active { transform:scale(.96); }
+.tm-diff-icon { font-size:22px; line-height:1; }
+.tm-diff-name { font-family:var(--font-mono); font-size:8px; letter-spacing:.18em; color:var(--text3); transition:color .18s; }
+.tm-diff-btn[data-p="low"].active    { background:rgba(0,255,179,.1);   border-color:rgba(0,255,179,.5); }
+.tm-diff-btn[data-p="low"].active    .tm-diff-name { color:var(--g); }
+.tm-diff-btn[data-p="medium"].active { background:rgba(255,209,102,.1); border-color:rgba(255,209,102,.5); }
+.tm-diff-btn[data-p="medium"].active .tm-diff-name { color:var(--y); }
+.tm-diff-btn[data-p="high"].active   { background:rgba(255,77,109,.1);  border-color:rgba(255,77,109,.5); }
+.tm-diff-btn[data-p="high"].active   .tm-diff-name { color:var(--r); }
+.tm-err { font-family:var(--font-mono); font-size:10px; color:var(--r); text-align:center; min-height:16px; letter-spacing:.1em; }
+.tm-save-btn { width:100%; padding:16px; background:rgba(0,229,255,.14); border:1px solid rgba(0,229,255,.45); border-radius:14px; color:var(--c); font-family:var(--font-mono); font-size:11px; letter-spacing:.22em; cursor:pointer; transition:all .2s; font-weight:700; }
+.tm-save-btn:active { background:rgba(0,229,255,.28); transform:scale(.99); }
+
+
+/* ── Edit Modal ── */
+.cal-drawer-item { cursor: default; }
+.cal-drawer-item .cal-drawer-body { cursor: pointer; flex: 1; min-width: 0; transition: background .15s; border-radius: 4px; padding: 2px 4px; margin: -2px -4px; }
+.cal-drawer-item .cal-drawer-body:hover .cal-drawer-title { color: var(--c); }
+.edit-pencil {
+  background: transparent; border: none;
+  color: rgba(0,229,255,.22); cursor: pointer;
+  font-size: 14px; padding: 2px 6px; border-radius: 3px;
+  transition: all .15s; align-self: center; flex-shrink: 0;
+}
+.edit-pencil:hover { color: var(--c); background: rgba(0,229,255,.08); }
+
+.edit-modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 9990;
+  background: rgba(4,8,12,.88); backdrop-filter: blur(14px);
+  align-items: center; justify-content: center;
+}
+.edit-modal-overlay.open { display: flex; }
+.edit-modal-box {
+  width: min(460px, 94vw);
+  background: rgba(11,21,32,.99);
+  border: 1px solid rgba(0,229,255,.35);
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 0 60px rgba(0,229,255,.15);
+  animation: modalIn .2s ease;
+}
+@keyframes modalIn { from{transform:scale(.95) translateY(10px);opacity:0} to{transform:none;opacity:1} }
+.edit-modal-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 15px 20px; border-bottom: 1px solid var(--border);
+  background: rgba(0,229,255,.04);
+}
+.edit-modal-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: .28em; color: var(--c); }
+.edit-modal-close {
+  background: transparent; border: none; color: var(--text3);
+  font-size: 16px; cursor: pointer; padding: 2px 7px;
+  border-radius: 4px; transition: all .15s;
+}
+.edit-modal-close:hover { color: var(--r); background: rgba(255,77,109,.08); }
+.edit-fields { padding: 16px 20px; display: flex; flex-direction: column; gap: 0; }
+.ef-label {
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .22em;
+  color: var(--text3); margin: 10px 0 4px; display: block;
+}
+.ef-label:first-child { margin-top: 0; }
+.ef-input {
+  width: 100%; background: rgba(0,229,255,.04); border: 1px solid rgba(0,229,255,.2);
+  border-radius: 5px; padding: 9px 12px; color: var(--c);
+  font-family: var(--font-body); font-size: 13px; outline: none;
+  transition: border-color .15s, box-shadow .15s; caret-color: var(--c); color-scheme: dark;
+}
+.ef-input:focus { border-color: rgba(0,229,255,.55); box-shadow: 0 0 14px rgba(0,229,255,.1); }
+.ef-textarea { resize: vertical; min-height: 64px; }
+.ef-row { display: flex; gap: 10px; }
+.ef-row > div { flex: 1; }
+.edit-modal-footer {
+  display: flex; gap: 10px; padding: 14px 20px;
+  border-top: 1px solid var(--border); background: rgba(0,229,255,.02);
+}
+.ef-btn-cancel {
+  flex: 1; padding: 10px; background: transparent;
+  border: 1px solid var(--border); border-radius: 5px; color: var(--text3);
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .2em; cursor: pointer; transition: all .15s;
+}
+.ef-btn-cancel:hover { border-color: rgba(255,77,109,.3); color: var(--r); }
+.ef-btn-save {
+  flex: 2; padding: 10px; background: rgba(0,229,255,.12);
+  border: 1px solid rgba(0,229,255,.4); border-radius: 5px; color: var(--c);
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .2em;
+  font-weight: 700; cursor: pointer; transition: all .15s;
+}
+.ef-btn-save:hover { background: rgba(0,229,255,.22); box-shadow: 0 0 20px rgba(0,229,255,.18); }
+
+/* ── Event Categories ── */
+:root {
+  --cat-praca:      #ff4d6d;
+  --cat-wyjscia:    #00ffb3;
+  --cat-obowiazki:  #ff6eb4;
+}
+.cat-praca     { background: rgba(255,77,109,.18)  !important; border-left-color: #ff4d6d !important; color: #ff4d6d !important; }
+.cat-wyjscia   { background: rgba(0,255,179,.15)   !important; border-left-color: #00ffb3 !important; color: #00ffb3 !important; }
+.cat-obowiazki { background: rgba(255,110,180,.15) !important; border-left-color: #ff6eb4 !important; color: #ff6eb4 !important; }
+
+.ef-cat-row { display: flex; gap: 8px; }
+.ef-cat-btn {
+  flex: 1; padding: 8px 6px; border-radius: 6px; cursor: pointer;
+  border: 1.5px solid rgba(255,255,255,.1); background: transparent;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .15em;
+  color: var(--text3); transition: all .18s; text-align: center;
+}
+.ef-cat-btn[data-cat="praca"]:hover     { border-color: #ff4d6d; color: #ff4d6d; background: rgba(255,77,109,.1); }
+.ef-cat-btn[data-cat="wyjscia"]:hover   { border-color: #00ffb3; color: #00ffb3; background: rgba(0,255,179,.1); }
+.ef-cat-btn[data-cat="obowiazki"]:hover { border-color: #ff6eb4; color: #ff6eb4; background: rgba(255,110,180,.1); }
+.ef-cat-btn.active[data-cat="praca"]     { border-color: #ff4d6d; color: #ff4d6d; background: rgba(255,77,109,.15); }
+.ef-cat-btn.active[data-cat="wyjscia"]   { border-color: #00ffb3; color: #00ffb3; background: rgba(0,255,179,.15); }
+.ef-cat-btn.active[data-cat="obowiazki"] { border-color: #ff6eb4; color: #ff6eb4; background: rgba(255,110,180,.15); }
+.ef-cat-btn.active { font-weight: 700; }
+
+.cat-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  display: inline-block; margin-right: 4px; vertical-align: middle;
+}
+.cat-dot-praca     { background: #ff4d6d; }
+.cat-dot-wyjscia   { background: #00ffb3; }
+.cat-dot-obowiazki { background: #ff6eb4; }
 </style>
 </head>
 <body>
@@ -2059,7 +1688,7 @@ nav {
       <button id="mic-btn" onclick="toggleMic()" title="Nagrywanie głosu">🎤</button>
       <textarea id="msg-input" rows="1"
         placeholder="Wpisz wiadomość lub użyj mikrofonu..."
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
       <button id="send-btn" onclick="sendMsg()">→</button>
     </div>
   </div>
@@ -2074,8 +1703,6 @@ nav {
           <span class="section-title">// NOTATKI</span>
           <button class="notes-new-btn" onclick="newNote()" title="Nowa notatka">＋</button>
         </div>
-        <input class="notes-search" id="notes-search" type="text"
-          placeholder="Szukaj notatek..." oninput="filterNotes(this.value)">
         <div class="notes-list-inner" id="notes-list"></div>
       </div>
 
@@ -2164,29 +1791,25 @@ nav {
 
   <!-- TASKS -->
   <div class="panel" id="panel-tasks">
-
-    <!-- Toolbar: filters + progress + add button -->
     <div class="tasks-topbar">
       <div class="tasks-filters-row">
         <div class="tasks-filters">
-          <button class="task-filter-btn active" onclick="setTaskFilter('all',this)">WSZYSTKIE</button>
-          <button class="task-filter-btn" onclick="setTaskFilter('active',this)">AKTYWNE</button>
+          <button class="task-filter-btn active" onclick="setTaskFilter('active',this)">AKTYWNE</button>
           <button class="task-filter-btn" onclick="setTaskFilter('done',this)">UKOŃCZONE</button>
         </div>
-        <button class="tasks-fab" onclick="openTaskModal()" title="Nowe zadanie">＋</button>
+        <button class="tasks-fab" onclick="openTaskModal()">＋</button>
       </div>
       <div class="tasks-progress-bar-wrap" id="tasks-progress-wrap">
         <div class="tasks-progress-bar" id="tasks-progress-bar"></div>
       </div>
       <div class="tasks-progress-stats" id="tasks-progress-stats"></div>
     </div>
-
     <div class="data-scroll" id="tasks-scroll" style="padding:14px 16px 20px">
       <div id="tasks-list"></div>
     </div>
   </div>
 
-  <!-- TASK ADD/EDIT MODAL -->
+  <!-- TASK MODAL -->
   <div class="task-modal-overlay" id="task-modal-overlay" onclick="closeTaskModal()">
     <div class="task-modal" onclick="event.stopPropagation()">
       <div class="task-modal-hdr">
@@ -2194,33 +1817,24 @@ nav {
         <button class="task-modal-close" onclick="closeTaskModal()">✕</button>
       </div>
       <div class="task-modal-body">
-
-        <!-- Title -->
         <div class="tm-field">
           <label class="tm-label">TYTUŁ</label>
           <input class="tm-input" id="tm-title" type="text" placeholder="Co trzeba zrobić...">
         </div>
-
-        <!-- Difficulty / Priority -->
         <div class="tm-field">
           <label class="tm-label">TRUDNOŚĆ</label>
           <div class="tm-difficulty">
             <button class="tm-diff-btn" data-p="low" onclick="selectTmPrio('low',this)">
-              <span class="tm-diff-icon">🟢</span>
-              <span class="tm-diff-name">ŁATWE</span>
+              <span class="tm-diff-icon">🟢</span><span class="tm-diff-name">ŁATWE</span>
             </button>
             <button class="tm-diff-btn active" data-p="medium" onclick="selectTmPrio('medium',this)">
-              <span class="tm-diff-icon">🟡</span>
-              <span class="tm-diff-name">ŚREDNIE</span>
+              <span class="tm-diff-icon">🟡</span><span class="tm-diff-name">ŚREDNIE</span>
             </button>
             <button class="tm-diff-btn" data-p="high" onclick="selectTmPrio('high',this)">
-              <span class="tm-diff-icon">🔴</span>
-              <span class="tm-diff-name">TRUDNE</span>
+              <span class="tm-diff-icon">🔴</span><span class="tm-diff-name">TRUDNE</span>
             </button>
           </div>
         </div>
-
-        <!-- Date + Time row -->
         <div class="tm-row">
           <div class="tm-field tm-field-half">
             <label class="tm-label">DATA TERMINU</label>
@@ -2231,15 +1845,8 @@ nav {
             <input class="tm-input" id="tm-time" type="time">
           </div>
         </div>
-
-        <!-- Note (optional) -->
-        <div class="tm-field">
-          <label class="tm-label">NOTATKA <span style="opacity:.4;font-size:8px">(OPCJONALNIE)</span></label>
-          <textarea class="tm-input tm-textarea" id="tm-note" placeholder="Dodatkowe informacje..."></textarea>
-        </div>
-
         <div class="tm-err" id="tm-err"></div>
-        <button class="tm-save-btn" onclick="saveTaskModal()">DODAJ ZADANIE ▶</button>
+        <button class="tm-save-btn" id="tm-save-btn" onclick="saveTaskModal()">DODAJ ZADANIE ▶</button>
       </div>
     </div>
   </div>
@@ -2370,7 +1977,7 @@ FORMATY:
 - note:           {"intent":"note","title":"...","content":"..."}
 - update_note:    {"intent":"update_note","id":123,"changes":{"title":"...","content":"..."}}
 - delete_note:    {"intent":"delete_note","id":123}
-- event:          {"intent":"event","title":"...","date":"YYYY-MM-DD","time":"HH:MM","timeEnd":"HH:MM","description":"..."}
+- event:          {"intent":"event","title":"...","date":"YYYY-MM-DD","time":"HH:MM","timeEnd":"HH:MM","description":"...","category":"praca|wyjscia|obowiazki|\"\""}
 - update_event:   {"intent":"update_event","id":123,"changes":{"title":"...","date":"...","time":"...","timeEnd":"...","description":"..."}}
 - delete_event:   {"intent":"delete_event","id":123}
 - task:           {"intent":"task","title":"...","priority":"high|medium|low","dueDate":"YYYY-MM-DD lub \"\""}
@@ -2385,6 +1992,7 @@ ZASADY:
 - Usuwanie/edycja: znajdź element po nazwie i użyj jego id. Brak dopasowania → chat z info.
 - "usuń wszystkie X": zwróć tablicę delete dla każdego elementu X.
 - "pokaż/co mam/lista": użyj intent list, w reply podaj czytelną listę.
+- Kategorie wydarzeń: praca (spotkania, projekty, klienci), wyjscia (restauracje, kino, sport, spacer), obowiazki (zakupy, wizyty, dokumenty, rachunki). Dobierz automatycznie lub użyj pustego "".
 - Odpowiadaj w języku użytkownika. Dzisiaj: ${today}.`;
 }
 
@@ -2421,8 +2029,8 @@ async function processAction(r){
     return {type:'note', msg:`Notatka zapisana ✓\n"${r.title}"`};
 
   }else if(r.intent==='event'){
-    const id=await dbAdd('events',{title:r.title,date:r.date,time:r.time||'',timeEnd:r.timeEnd||'',description:r.description||''});
-    events.push({id,title:r.title,date:r.date,time:r.time||'',timeEnd:r.timeEnd||'',description:r.description||'',createdAt:new Date().toISOString()});
+    const id=await dbAdd('events',{title:r.title,date:r.date,time:r.time||'',timeEnd:r.timeEnd||'',description:r.description||'',category:r.category||''});
+    events.push({id,title:r.title,date:r.date,time:r.time||'',timeEnd:r.timeEnd||'',description:r.description||'',category:r.category||'',createdAt:new Date().toISOString()});
     const timeStr=r.time?(r.timeEnd?` ${r.time}–${r.timeEnd}`:` o ${r.time}`):'';
     return {type:'event', msg:`Wydarzenie dodane ✓\n"${r.title}" · ${r.date}${timeStr}` };
 
@@ -2490,11 +2098,11 @@ async function processAction(r){
 
 // ── Send ──────────────────────────────────────────────────────────
 async function sendMsg(){
+  if(isRecording) stopMic();
   const inp=document.getElementById('msg-input');
   const text=inp.value.trim();
   if(!text)return;
   inp.value='';
-  inp.blur(); // dismiss keyboard on iOS after send
   setLoading(true);
   addUserMsg(text);
   showTyping();
@@ -2552,7 +2160,14 @@ function addUserMsg(text){const el=document.getElementById('chat-messages');el.i
 function addBotMsg(intent,text){const el=document.getElementById('chat-messages');const tag=LABELS[intent]?`<div><span class="intent-tag ${TAGS[intent]}">${LABELS[intent]}</span></div>`:'';el.insertAdjacentHTML('beforeend',`<div class="msg"><div class="avatar">◈</div><div class="bubble-wrap">${tag}<div class="bubble">${esc(text)}</div><div class="ts">${ts()}</div></div></div>`);el.scrollTop=el.scrollHeight}
 function showTyping(){const el=document.getElementById('chat-messages');el.insertAdjacentHTML('beforeend',`<div class="msg" id="typing"><div class="avatar">◈</div><div class="bubble-wrap"><div class="bubble"><span class="dots"><span></span><span></span><span></span></span></div></div></div>`);el.scrollTop=el.scrollHeight}
 function removeTyping(){document.getElementById('typing')?.remove()}
-function switchTab(id,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('panel-'+id).classList.add('active');if(btn)btn.classList.add('active');if(id==='calendar'){calDate=new Date();renderCalView();}}
+function switchTab(id,btn){
+  if(isRecording) stopMic();
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='calendar'){calDate=new Date();renderCalView();}
+}
 
 // ── Render ─────────────────────────────────────────────────────────
 function renderAll(){renderNotes();renderCalendar();renderTasks();renderStats();}
@@ -2739,14 +2354,23 @@ function renderMonth(){
   document.getElementById('cal-body').innerHTML=html;
 }
 
+function sortEvsByTime(evs){
+  return evs.slice().sort((a,b)=>{
+    if(!a.time && !b.time) return 0;
+    if(!a.time) return 1;
+    if(!b.time) return -1;
+    return a.time.localeCompare(b.time);
+  });
+}
 function calCell(dayNum,dateStr,otherMonth,isToday,evs){
+  evs = sortEvsByTime(evs);
   const cls=['cal-cell'];
   if(otherMonth) cls.push('other-month');
   if(isToday) cls.push('today');
   let inner=`<div class="cal-day-num">${dayNum}</div>`;
   const shown=evs.slice(0,2);
   shown.forEach(e=>{
-    inner+=`<div class="cal-event-dot" title="${esc(e.title)}">${esc(e.time?e.time+' ':'')}${esc(e.title)}</div>`;
+    inner+=`<div class="cal-event-dot${e.category?' cat-'+e.category:''}" title="${esc(e.title)}"><span class="cat-dot cat-dot-${e.category||''}" style="${e.category?'':'display:none'}"></span>${esc(e.time?e.time+' ':'')}${esc(e.title)}</div>`;
   });
   if(evs.length>2) inner+=`<div class="cal-event-dot more">+${evs.length-2} więcej</div>`;
   return `<div class="${cls.join(' ')}" onclick="openDrawer('${dateStr}')">${inner}</div>`;
@@ -2785,7 +2409,7 @@ function renderWeek(){
     const dayEvs=eventsForDate(ds);
     html+=`<div class="cal-week-day-col">`;
     for(let h=0;h<24;h++) html+=`<div class="cal-hour-slot"></div>`;
-    dayEvs.forEach(ev=>{
+    sortEvsByTime(dayEvs).forEach(ev=>{
       if(!ev.time) return;
       const [hh,mm]=ev.time.split(':').map(Number);
       const top=(hh+(mm||0)/60)*48;
@@ -2795,7 +2419,7 @@ function renderWeek(){
         height=Math.max(24,((eh+(em||0)/60)-(hh+(mm||0)/60))*48);
       }
       const timeLabel=ev.timeEnd?`${ev.time}–${ev.timeEnd}`:ev.time;
-      html+=`<div class="cal-week-event" style="top:${top}px;height:${height}px" onclick="openDrawer('${ds}')" title="${esc(ev.title)}">${esc(timeLabel)} ${esc(ev.title)}</div>`;
+      html+=`<div class="cal-week-event${ev.category?' cat-'+ev.category:''}" style="top:${top}px;height:${height}px" onclick="openDrawer('${ds}')" title="${esc(ev.title)}">${esc(timeLabel)} ${esc(ev.title)}</div>`;
     });
     html+='</div>';
   });
@@ -2833,7 +2457,7 @@ function renderDay(){
   html+='<div class="cal-day-col">';
   for(let h=0;h<24;h++) html+=`<div class="cal-hour-slot"></div>`;
 
-  dayEvs.forEach(ev=>{
+  sortEvsByTime(dayEvs).forEach(ev=>{
     if(!ev.time) return;
     const [hh,mm]=ev.time.split(':').map(Number);
     const top=(hh+(mm||0)/60)*48;
@@ -2843,7 +2467,7 @@ function renderDay(){
       height=Math.max(32,((eh+(em||0)/60)-(hh+(mm||0)/60))*48);
     }
     const timeLabel=ev.timeEnd?`${ev.time}–${ev.timeEnd}`:ev.time;
-    html+=`<div class="cal-day-event" style="top:${top}px;min-height:${height}px" onclick="openDrawer('${ds}')">${esc(timeLabel)} <strong>${esc(ev.title)}</strong>${ev.description?'<br><span style=\'font-size:10px;opacity:.7\'>'+esc(ev.description)+'</span>':''}</div>`;
+    html+=`<div class="cal-day-event${ev.category?' cat-'+ev.category:''}" style="top:${top}px;min-height:${height}px" onclick="openDrawer('${ds}')">${esc(timeLabel)} <strong>${esc(ev.title)}</strong>${ev.description?'<br><span style=\'font-size:10px;opacity:.7\'>'+esc(ev.description)+'</span>':''}</div>`;
   });
   if(nowMinutes>=0){
     html+=`<div class="cal-now-line" style="top:${nowMinutes/60*48}px"></div>`;
@@ -2871,23 +2495,34 @@ function renderDay(){
 let currentDrawerDate = null;
 function openDrawer(dateStr){
   currentDrawerDate = dateStr;
-  const evs=eventsForDate(dateStr);
   const label=new Date(dateStr).toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'});
   document.getElementById('cal-drawer-date').textContent=label.toUpperCase();
-  if(!evs.length){
-    document.getElementById('cal-drawer-list').innerHTML='<div class="empty" style="margin:20px 0;font-size:10px">BRAK WYDARZEŃ</div>';
-  } else {
-    document.getElementById('cal-drawer-list').innerHTML=evs.map(e=>`
-      <div class="cal-drawer-item">
-        <div class="cal-drawer-time">${e.time||'—'}${e.timeEnd?' → '+e.timeEnd:''}</div>
-        <div>
-          <div class="cal-drawer-title">${esc(e.title)}</div>
-          ${e.description?`<div class="cal-drawer-desc">${esc(e.description)}</div>`:''}
-        </div>
-        <button class="cal-drawer-del" onclick="deleteItem('events',${e.id})">✕</button>
-      </div>`).join('');
-  }
+  renderDrawerList(dateStr);
   document.getElementById('cal-drawer').classList.add('open');
+}
+
+function renderDrawerList(dateStr){
+  const evs = eventsForDate(dateStr).slice().sort((a,b)=>{
+    if(!a.time && !b.time) return 0;
+    if(!a.time) return 1;
+    if(!b.time) return -1;
+    return a.time.localeCompare(b.time);
+  });
+  const el = document.getElementById('cal-drawer-list');
+  if(!evs.length){
+    el.innerHTML='<div class="empty" style="margin:20px 0;font-size:10px">BRAK WYDARZEŃ<br>Powiedz Jarvisowi co dodać</div>';
+    return;
+  }
+  el.innerHTML = evs.map(e=>`
+    <div class="cal-drawer-item" data-id="${e.id}">
+      <div class="cal-drawer-time" style="${e.category==='praca'?'color:#ff4d6d':e.category==='wyjscia'?'color:#00ffb3':e.category==='obowiazki'?'color:#ff6eb4':''}">${e.time||'—'}${e.timeEnd?' → '+e.timeEnd:''}${e.category?` <span style="font-size:8px;letter-spacing:.12em;opacity:.8">${e.category.toUpperCase()}</span>`:''}</div>
+      <div class="cal-drawer-body" onclick="openEditModal(${e.id})" title="Kliknij aby edytować">
+        <div class="cal-drawer-title">${esc(e.title)}</div>
+        ${e.description?`<div class="cal-drawer-desc">${esc(e.description)}</div>`:''}
+      </div>
+      <button class="edit-pencil" onclick="openEditModal(${e.id})" title="Edytuj">✎</button>
+      <button class="cal-drawer-del" onclick="deleteItemFromDrawer(${e.id})" title="Usuń">✕</button>
+    </div>`).join('');
 }
 function closeDrawer(){
   document.getElementById('cal-drawer').classList.remove('open');
@@ -2928,15 +2563,9 @@ async function saveEventFromModal(){
   openDrawer(date);
 }
 // ── Tasks state ──────────────────────────────────────────────────
-let taskFilter = 'all';
-let taskPrioFilter = 'all'; // 'all' | 'high' | 'medium' | 'low'
+let taskFilter = 'active';
+let taskPrioFilter = 'all';
 let tmPrio = 'medium';
-
-function setPrioFilter(p, btn){
-  // toggle off if already active
-  taskPrioFilter = (taskPrioFilter === p) ? 'all' : p;
-  renderTasks();
-}
 
 function setTaskFilter(f, btn){
   taskFilter = f;
@@ -2945,7 +2574,10 @@ function setTaskFilter(f, btn){
   renderTasks();
 }
 
-function setTaskPrio(p, btn){ renderTasks(); }
+function setPrioFilter(p){
+  taskPrioFilter = (taskPrioFilter === p) ? 'all' : p;
+  renderTasks();
+}
 
 // ── Render tasks ─────────────────────────────────────────────────
 function renderTasks(){
@@ -2954,7 +2586,6 @@ function renderTasks(){
   const allDone   = tasks.filter(t=>t.done);
   document.getElementById('cnt-tasks').textContent = allActive.length;
 
-  // Progress bar + difficulty stats
   const wrap  = document.getElementById('tasks-progress-wrap');
   const stats = document.getElementById('tasks-progress-stats');
   if(tasks.length){
@@ -2963,11 +2594,11 @@ function renderTasks(){
     const pc = (p) => allActive.filter(t=>(t.priority||'medium')===p).length;
     const pA = (p) => taskPrioFilter===p?' active':'';
     stats.innerHTML =
-      `<button class="prio-filter-pill pill-all${taskPrioFilter==='all'?' active':''}" onclick="setPrioFilter('all',this)"><span class="pill-dot"></span>${tasks.length}</button>` +
-      `<button class="prio-filter-pill pill-high${pA('high')}" onclick="setPrioFilter('high',this)"><span class="pill-dot"></span>${pc('high')}</button>` +
-      `<button class="prio-filter-pill pill-medium${pA('medium')}" onclick="setPrioFilter('medium',this)"><span class="pill-dot"></span>${pc('medium')}</button>` +
-      `<button class="prio-filter-pill pill-low${pA('low')}" onclick="setPrioFilter('low',this)"><span class="pill-dot"></span>${pc('low')}</button>` +
-      `<span style="margin-left:auto;color:var(--text3);font-size:9px">${allDone.length}/${tasks.length} · ${pct}%</span>`;
+      `<button class="prio-filter-pill pill-all${taskPrioFilter==='all'?' active':''}" onclick="setPrioFilter('all')"><span class="pill-dot"></span>${tasks.length}</button>` +
+      `<button class="prio-filter-pill pill-high${pA('high')}"   onclick="setPrioFilter('high')"><span class="pill-dot"></span>${pc('high')}</button>` +
+      `<button class="prio-filter-pill pill-medium${pA('medium')}" onclick="setPrioFilter('medium')"><span class="pill-dot"></span>${pc('medium')}</button>` +
+      `<button class="prio-filter-pill pill-low${pA('low')}"    onclick="setPrioFilter('low')"><span class="pill-dot"></span>${pc('low')}</button>` +
+      `<span style="margin-left:auto;font-size:9px">${allDone.length}/${tasks.length} · ${pct}%</span>`;
     wrap.style.display = '';
     stats.style.display = 'flex';
   } else {
@@ -2991,23 +2622,22 @@ function renderTasks(){
   }
 
   const todayStr = new Date().toISOString().split('T')[0];
-  const prioOrder = {high:0, medium:1, low:2};
-  const sorted = [...filtered].sort((a,b) => {
-    if(a.done !== b.done) return a.done ? 1 : -1;
-    return (prioOrder[a.priority||'medium']||1) - (prioOrder[b.priority||'medium']||1);
+  const prioOrder = {high:0,medium:1,low:2};
+  const sorted = [...filtered].sort((a,b)=>{
+    if(a.done!==b.done) return a.done?1:-1;
+    return (prioOrder[a.priority||'medium']||1)-(prioOrder[b.priority||'medium']||1);
   });
 
   const activeCards = sorted.filter(t=>!t.done);
   const doneCards   = sorted.filter(t=>t.done);
-
   let html = '';
   if(activeCards.length){
     if(doneCards.length) html += `<div class="tasks-section-label">AKTYWNE · ${activeCards.length}</div>`;
-    html += activeCards.map(t => taskCardHTML(t, todayStr)).join('');
+    html += activeCards.map(t=>taskCardHTML(t,todayStr)).join('');
   }
   if(doneCards.length){
-    html += `<div class="tasks-section-label" style="margin-top:${activeCards.length?18:0}px">UKONCZONE · ${doneCards.length}</div>`;
-    html += doneCards.map(t => taskCardHTML(t, todayStr)).join('');
+    html += `<div class="tasks-section-label" style="margin-top:${activeCards.length?18:0}px">UKOŃCZONE · ${doneCards.length}</div>`;
+    html += doneCards.map(t=>taskCardHTML(t,todayStr)).join('');
   }
   el.innerHTML = html;
 }
@@ -3016,101 +2646,124 @@ function taskCardHTML(t, todayStr){
   const p = t.priority || 'medium';
   const doneClass = t.done ? 'done-card' : '';
   const overdue = t.dueDate && !t.done && t.dueDate < todayStr;
-
-  const diffLabels = {high:'TRUDNE', medium:'SREDNIE', low:'LATWE'};
-  const diffIcons  = {high:'\uD83D\uDD34', medium:'\uD83D\uDFE1', low:'\uD83D\uDFE2'};
-
-  // Clickable chip that cycles low→medium→high→low
-  const diffChip = `<button class="task-diff-chip diff-${p} diff-btn-cycle"
-    onclick="cycleTaskDiff(${t.id},event)"
-    title="Kliknij aby zmienić trudność"
-  >${diffIcons[p]} ${diffLabels[p]} ✎</button>`;
-
+  const diffLabels = {high:'TRUDNE',medium:'ŚREDNIE',low:'ŁATWE'};
+  const diffIcons  = {high:'🔴',medium:'🟡',low:'🟢'};
+  const diffChip = `<button class="task-diff-chip diff-${p}" onclick="cycleTaskDiff(${t.id},event)">${diffIcons[p]} ${diffLabels[p]} ✎</button>`;
   let dueStr = '';
   if(t.dueDate){
-    const dl = new Date(t.dueDate + 'T12:00:00').toLocaleDateString('pl-PL',{day:'numeric',month:'short'});
-    const tl = t.dueTime ? ' \u00b7 ' + t.dueTime : '';
-    dueStr = `<span class="task-card-due${overdue?' overdue':''}">\uD83D\uDCC5 ${overdue?'\u26A0\uFE0F ':''}${dl}${tl}</span>`;
+    const dl = new Date(t.dueDate+'T12:00:00').toLocaleDateString('pl-PL',{day:'numeric',month:'short'});
+    const tl = t.dueTime ? ' · '+t.dueTime : '';
+    dueStr = `<span class="task-card-due${overdue?' overdue':''}">📅 ${overdue?'⚠ ':''}${dl}${tl}</span>`;
   }
-
-  const noteHtml = t.note ? `<div class="task-card-note">${esc(t.note)}</div>` : '';
-
   return `<div class="task-card prio-${p} ${doneClass}" id="tcard-${t.id}">
-    <button class="task-card-del" onclick="deleteItem('tasks',${t.id})">\u2715</button>
-    <div class="task-card-row">
-      <div class="task-toggle${t.done?' checked':''}" onclick="toggleTask(${t.id})"></div>
-      <span class="task-card-title">${esc(t.title)}</span>
+    <div class="task-card-actions">
+      <button class="task-card-edit" onclick="openTaskModal(${t.id})" title="Edytuj">✎</button>
+      <button class="task-card-del" onclick="deleteItem('tasks',${t.id})">✕</button>
     </div>
-    <div class="task-card-meta-row">
-      ${diffChip}
-      ${dueStr}
+    <div class="task-card-inner" onclick="toggleTask(${t.id})">
+      <div class="task-toggle-col">
+        <div class="task-toggle${t.done?' checked':''}"></div>
+      </div>
+      <div class="task-card-content">
+        <span class="task-card-title">${esc(t.title)}</span>
+        <div class="task-card-meta-row">
+          ${diffChip}
+          ${dueStr}
+        </div>
+      </div>
     </div>
-    ${noteHtml}
   </div>`;
 }
 
 async function cycleTaskDiff(id, event){
   event.stopPropagation();
   const t = tasks.find(x=>x.id===id);
-  if(!t || t.done) return;
-  const cycle = {low:'medium', medium:'high', high:'low'};
+  if(!t||t.done) return;
+  const cycle = {low:'medium',medium:'high',high:'low'};
   t.priority = cycle[t.priority||'medium'];
-  await dbPut('tasks', t);
-  if(typeof haptic !== 'undefined') haptic('light');
+  await dbPut('tasks',t);
   renderTasks();
 }
 
 // ── Task modal ────────────────────────────────────────────────────
-function openTaskModal(){
-  tmPrio = 'medium';
-  document.getElementById('tm-title').value = '';
-  document.getElementById('tm-date').value  = '';
-  document.getElementById('tm-time').value  = '';
-  document.getElementById('tm-note').value  = '';
+let editingTaskId = null;
+
+function openTaskModal(taskId){
+  editingTaskId = taskId || null;
+  const t = taskId ? tasks.find(x=>x.id===taskId) : null;
+  tmPrio = t ? (t.priority||'medium') : 'medium';
+  document.getElementById('tm-title').value = t ? t.title : '';
+  document.getElementById('tm-date').value  = t ? (t.dueDate||'') : '';
+  document.getElementById('tm-time').value  = t ? (t.dueTime||'') : '';
   document.getElementById('tm-err').textContent = '';
-  document.getElementById('task-modal-title').textContent = 'NOWE ZADANIE';
+  document.getElementById('task-modal-title').textContent = t ? 'EDYTUJ ZADANIE' : 'NOWE ZADANIE';
+  document.getElementById('tm-save-btn').textContent = t ? 'ZAPISZ ZMIANY ▶' : 'DODAJ ZADANIE ▶';
   document.querySelectorAll('.tm-diff-btn').forEach(b=>{
-    b.classList.toggle('active', b.dataset.p === 'medium');
+    b.classList.toggle('active', b.dataset.p===tmPrio);
   });
   document.getElementById('task-modal-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('tm-title').focus(), 150);
 }
-
 function closeTaskModal(){
   document.getElementById('task-modal-overlay').classList.remove('open');
+  editingTaskId = null;
 }
-
 function selectTmPrio(p, btn){
   tmPrio = p;
   document.querySelectorAll('.tm-diff-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
 }
-
 async function saveTaskModal(){
   const title = document.getElementById('tm-title').value.trim();
   const date  = document.getElementById('tm-date').value;
   const time  = document.getElementById('tm-time').value;
-  const note  = document.getElementById('tm-note').value.trim();
   const errEl = document.getElementById('tm-err');
   errEl.textContent = '';
-  if(!title){ errEl.textContent = '⚠ Wpisz tytul zadania'; return; }
+  if(!title){ errEl.textContent = '⚠ Wpisz tytuł zadania'; return; }
 
-  const id = await dbAdd('tasks',{title, priority: tmPrio, dueDate: date, dueTime: time, note, done: false});
-  tasks.push({id, title, priority: tmPrio, dueDate: date, dueTime: time, note, done: false, createdAt: new Date().toISOString()});
+  if(editingTaskId){
+    const t = tasks.find(x=>x.id===editingTaskId);
+    if(t){
+      t.title=title; t.priority=tmPrio; t.dueDate=date; t.dueTime=time;
+      await dbPut('tasks',t);
+    }
+  } else {
+    const id = await dbAdd('tasks',{title,priority:tmPrio,dueDate:date,dueTime:time,done:false});
+    tasks.push({id,title,priority:tmPrio,dueDate:date,dueTime:time,done:false,createdAt:new Date().toISOString()});
+  }
   closeTaskModal();
   renderTasks(); renderStats();
-  if(typeof haptic !== 'undefined') haptic('success');
 }
 
 async function changeTaskPrio(id, prio){
   const t = tasks.find(x=>x.id===id);
   if(!t) return;
   t.priority = prio;
-  await dbPut('tasks', t);
+  await dbPut('tasks',t);
   renderTasks();
 }
 function renderStats(){document.getElementById('stat-notes').textContent=notes.length;document.getElementById('stat-cal').textContent=events.length;document.getElementById('stat-tasks').textContent=tasks.filter(t=>!t.done).length}
-async function deleteItem(store,id){await dbDelete(store,id);if(store==='notes')notes=notes.filter(x=>x.id!==id);if(store==='events')events=events.filter(x=>x.id!==id);if(store==='tasks')tasks=tasks.filter(x=>x.id!==id);renderAll()}
+async function deleteItem(store,id){ await dbDelete(store,id); if(store==='notes') notes=notes.filter(x=>x.id!==id); if(store==='events') events=events.filter(x=>x.id!==id); if(store==='tasks') tasks=tasks.filter(x=>x.id!==id); renderAll(); }
+
+async function deleteItemFromDrawer(id){
+  // slide out animation
+  const el = document.querySelector(`.cal-drawer-item[data-id="${id}"]`);
+  if(el){
+    el.style.transition = 'opacity .2s ease, transform .2s ease, max-height .25s ease .15s, padding .25s ease .15s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(28px)';
+    el.style.maxHeight = el.offsetHeight + 'px';
+    await new Promise(r=>setTimeout(r,160));
+    el.style.maxHeight = '0';
+    el.style.padding = '0';
+    await new Promise(r=>setTimeout(r,260));
+  }
+  await dbDelete('events', id);
+  events = events.filter(x=>x.id!==id);
+  renderDrawerList(currentDrawerDate);
+  renderCalView();
+  document.getElementById('cnt-cal').textContent = events.length;
+}
 async function toggleTask(id){const t=tasks.find(x=>x.id===id);if(!t)return;t.done=!t.done;await dbPut('tasks',t);renderTasks();renderStats()}
 
 // ── Speech Recognition ────────────────────────────────────────────
@@ -3206,16 +2859,12 @@ function toggleMic() {
 // NOTIFICATION SYSTEM
 // ════════════════════════════════════════════════════════
 
-// Track what we already notified so we don't repeat
 const notifiedSet = new Set(JSON.parse(localStorage.getItem('jarvis_notified') || '[]'));
 function markNotified(key) {
   notifiedSet.add(key);
-  // keep max 200 keys to avoid bloat
-  const arr = [...notifiedSet].slice(-200);
-  localStorage.setItem('jarvis_notified', JSON.stringify(arr));
+  localStorage.setItem('jarvis_notified', JSON.stringify([...notifiedSet].slice(-300)));
 }
 
-// Update bell icon based on permission state
 function updateBellIcon() {
   const btn = document.getElementById('notif-bell');
   if (!btn) return;
@@ -3225,206 +2874,206 @@ function updateBellIcon() {
     btn.title = 'Powiadomienia włączone';
   } else if (Notification.permission === 'denied') {
     btn.textContent = '🔕'; btn.className = 'notif-bell denied';
-    btn.title = 'Powiadomienia zablokowane — odblokuj w ustawieniach';
+    btn.title = 'Powiadomienia zablokowane';
   } else {
     btn.textContent = '🔔'; btn.className = 'notif-bell';
-    btn.title = 'Kliknij aby włączyć powiadomienia';
+    btn.title = 'Włącz powiadomienia';
   }
 }
 
 async function requestNotifPermission() {
   if (!('Notification' in window)) {
-    // iOS w Safari (nie PWA) — powiadomienia niedostępne
-    if (isIOS() && !isStandalone()) {
-      alert('Na iPhone wymagane jest dodanie aplikacji do ekranu głównego.\n\nSafari → Udostępnij → Dodaj do ekranu głównego\n\nPotem otwórz JARVIS z ekranu głównego i włącz powiadomienia.');
-    } else {
-      alert('Twoja przeglądarka nie obsługuje powiadomień.');
-    }
+    alert('Na iPhone: dodaj JARVIS do ekranu głównego (Safari → Udostępnij → Dodaj do ekranu głównego), potem włącz powiadomienia.');
     return;
   }
   if (Notification.permission === 'denied') {
-    if (isIOS()) {
-      alert('Powiadomienia są zablokowane.\n\nUstawienia → JARVIS → Powiadomienia → włącz');
-    } else {
-      alert('Powiadomienia są zablokowane.\nOdblokuj w ustawieniach przeglądarki.');
-    }
+    alert('Powiadomienia są zablokowane.\nUstawienia → JARVIS → Powiadomienia → włącz');
     return;
   }
   const perm = await Notification.requestPermission();
   updateBellIcon();
   if (perm === 'granted') {
-    sendNotification('🔔 JARVIS', 'Powiadomienia włączone.', 'welcome');
+    sendNotification('🔔 JARVIS aktywny', 'Powiadomienia włączone. Będziesz dostawać alerty o zadaniach i wydarzeniach.', 'welcome');
   }
 }
 
-// Detect iOS PWA
-function isIOS() {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-function isStandalone() {
-  return window.navigator.standalone === true;
-}
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
 
-// Core function: send notification
-// iOS wymaga: PWA (dodana do ekranu głównego) + iOS 16.4+
-// Na iOS SW.showNotification działa TYLKO z push subscription — bez niej używamy new Notification()
 async function sendNotification(title, body, tag) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const notifTag = tag || 'jarvis-' + Date.now();
-
-  // iOS: zawsze użyj new Notification() — SW.showNotification bez push nie działa
+  const t = tag || 'jarvis-' + Date.now();
   if (isIOS()) {
-    try { new Notification(title, { body, icon: 'icon-192.png', tag: notifTag }); } catch(_) {}
+    try { new Notification(title, { body, icon: 'icon-192.png', tag: t }); } catch(_) {}
     return;
   }
-
-  // Pozostałe platformy: preferuj SW (działa w tle)
   try {
     if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.ready;
-      await reg.showNotification(title, {
-        body,
-        icon: 'icon-192.png',
-        badge: 'icon-192.png',
-        tag: notifTag,
-        renotify: true,
-        vibrate: [200, 100, 200],
-      });
+      await reg.showNotification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: t, renotify: true, vibrate: [200,100,200] });
     } else {
-      new Notification(title, { body, icon: 'icon-192.png', tag: notifTag });
+      new Notification(title, { body, tag: t });
     }
   } catch(e) {
-    try { new Notification(title, { body, tag: notifTag }); } catch(_) {}
+    try { new Notification(title, { body, tag: t }); } catch(_) {}
   }
 }
 
-// ── Calendar reminders: 1h before and at event time ──
-function checkCalendarReminders() {
-  const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const nowMins = now.getHours() * 60 + now.getMinutes();
-
-  events.forEach(ev => {
-    if (!ev.time) return;
-    const [hh, mm] = ev.time.split(':').map(Number);
-    const evMins = hh * 60 + mm;
-
-    // 1 hour before (fire in window 58–62 min before)
-    const diff1h = evMins - nowMins;
-    if (ev.date === todayStr && diff1h >= 58 && diff1h <= 62) {
-      const key = `ev-1h-${ev.id}-${todayStr}`;
-      if (!notifiedSet.has(key)) {
-        markNotified(key);
-        sendNotification(
-          '⏰ Za godzinę: ' + ev.title,
-          `Dzisiaj o ${ev.time}${ev.timeEnd ? '–' + ev.timeEnd : ''}${ev.description ? '\n' + ev.description : ''}`,
-          key
-        );
-      }
-    }
-
-    // 10 minutes before
-    const diff10 = evMins - nowMins;
-    if (ev.date === todayStr && diff10 >= 8 && diff10 <= 12) {
-      const key = `ev-10m-${ev.id}-${todayStr}`;
-      if (!notifiedSet.has(key)) {
-        markNotified(key);
-        sendNotification(
-          '🚨 Za 10 min: ' + ev.title,
-          `Dzisiaj o ${ev.time}${ev.timeEnd ? '–' + ev.timeEnd : ''}`,
-          key
-        );
-      }
-    }
-
-    // At event time (±2 min)
-    const diffAt = evMins - nowMins;
-    if (ev.date === todayStr && diffAt >= -2 && diffAt <= 2) {
-      const key = `ev-now-${ev.id}-${todayStr}`;
-      if (!notifiedSet.has(key)) {
-        markNotified(key);
-        sendNotification(
-          '📅 Teraz: ' + ev.title,
-          `Wydarzenie rozpoczyna się o ${ev.time}`,
-          key
-        );
-      }
-    }
-  });
-}
-
-// ── Task reminders: every hour if there are active tasks ──
+// ── 1. Co godzinę: przypomnienie o aktywnych zadaniach ──
 function checkTaskReminders() {
   const now = new Date();
   const mins = now.getMinutes();
-  // Fire in minutes 0–4 of each hour (to catch the top of the hour reliably)
-  if (mins > 4) return;
+  if (mins > 4) return; // tylko w oknie 0–4 min każdej godziny
+
+  const hour = now.getHours();
+  if (hour < 7 || hour >= 23) return; // tylko 7:00–22:00
 
   const activeTasks = tasks.filter(t => !t.done);
   if (!activeTasks.length) return;
-
-  const hour = now.getHours();
-  // Only remind during working hours: 8:00–22:00
-  if (hour < 8 || hour >= 22) return;
 
   const dateKey = now.toISOString().split('T')[0];
   const key = `tasks-hour-${dateKey}-${hour}`;
   if (notifiedSet.has(key)) return;
   markNotified(key);
 
-  // Pick up to 3 high-priority tasks to show
-  const sorted = [...activeTasks].sort((a,b) => {
-    const o = {high:0,medium:1,low:2};
-    return (o[a.priority]||1) - (o[b.priority]||1);
-  });
+  const sorted = [...activeTasks].sort((a,b) => ({high:0,medium:1,low:2}[a.priority||'medium'] || 1) - ({high:0,medium:1,low:2}[b.priority||'medium'] || 1));
   const preview = sorted.slice(0,3).map(t => '• ' + t.title).join('\n');
-  const more = activeTasks.length > 3 ? `\n+${activeTasks.length - 3} więcej` : '';
+  const extra = activeTasks.length > 3 ? `\n+${activeTasks.length - 3} więcej` : '';
 
   sendNotification(
-    `✅ Masz ${activeTasks.length} aktywnych zadań`,
-    preview + more,
+    `✅ ${activeTasks.length} aktywnych zadań`,
+    preview + extra,
     key
   );
 }
 
-// ── Tomorrow's events reminder at 20:00 ──
-function checkTomorrowReminder() {
+// ── 2. Codziennie o 6:00: grafik dnia z kalendarza ──
+function checkMorningSchedule() {
   const now = new Date();
-  if (now.getHours() !== 20 || now.getMinutes() > 4) return;
+  if (now.getHours() !== 6 || now.getMinutes() > 4) return;
 
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tStr = tomorrow.toISOString().split('T')[0];
-  const tomorrowEvs = events.filter(e => e.date === tStr);
-  if (!tomorrowEvs.length) return;
-
-  const dateKey = now.toISOString().split('T')[0];
-  const key = `tomorrow-${dateKey}`;
+  const todayStr = now.toISOString().split('T')[0];
+  const key = `morning-schedule-${todayStr}`;
   if (notifiedSet.has(key)) return;
   markNotified(key);
 
-  const list = tomorrowEvs.slice(0,3).map(e => `• ${e.time||'?:??'} ${e.title}`).join('\n');
-  sendNotification(
-    `📅 Jutro masz ${tomorrowEvs.length} wydarzeń`,
-    list,
-    key
-  );
+  const todayEvs = events
+    .filter(e => e.date === todayStr)
+    .sort((a,b) => (a.time||'').localeCompare(b.time||''));
+
+  if (!todayEvs.length) {
+    sendNotification('🌅 Dzień dobry!', 'Nie masz żadnych wydarzeń zaplanowanych na dziś.', key);
+  } else {
+    const list = todayEvs.map(e => `• ${e.time||'??:??'}${e.timeEnd?'–'+e.timeEnd:''} ${e.title}`).join('\n');
+    sendNotification(
+      `🌅 Grafik na dziś — ${todayEvs.length} wydarzeń`,
+      list,
+      key
+    );
+  }
 }
 
-// ── Master tick: runs every minute ──
+// ── 3. Godzinę przed wydarzeniem w kalendarzu ──
+function checkEventReminders() {
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+
+  events.forEach(ev => {
+    if (!ev.time || ev.date !== todayStr) return;
+    const [hh, mm] = ev.time.split(':').map(Number);
+    const evMins = hh * 60 + mm;
+    const diff = evMins - nowMins;
+
+    // Okno 58–62 min przed — czyli "godzinę przed"
+    if (diff >= 58 && diff <= 62) {
+      const key = `ev-1h-${ev.id}-${todayStr}`;
+      if (!notifiedSet.has(key)) {
+        markNotified(key);
+        sendNotification(
+          `⏰ Za godzinę: ${ev.title}`,
+          `Dzisiaj o ${ev.time}${ev.timeEnd ? '–' + ev.timeEnd : ''}${ev.description ? '\n' + ev.description : ''}`,
+          key
+        );
+      }
+    }
+  });
+}
+
+// ── Master tick co minutę ──
 function notifTick() {
   if (Notification.permission !== 'granted') return;
-  checkCalendarReminders();
   checkTaskReminders();
-  checkTomorrowReminder();
+  checkMorningSchedule();
+  checkEventReminders();
 }
 
-// Start ticker when app loads
+// Stop mic when app goes to background or screen locks
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && isRecording) stopMic();
+});
+
 function initNotifications() {
   updateBellIcon();
-  // Check immediately, then every 60s
   notifTick();
   setInterval(notifTick, 60_000);
+}
+
+// ── Edit Modal ─────────────────────────────────────────────────────
+let editingEventId = null;
+
+function openEditModal(id){
+  const ev = events.find(e=>e.id===id);
+  if(!ev) return;
+  editingEventId = id;
+  document.getElementById('ef-title').value   = ev.title        || '';
+  document.getElementById('ef-date').value    = ev.date         || '';
+  document.getElementById('ef-time').value    = ev.time         || '';
+  document.getElementById('ef-timeEnd').value = ev.timeEnd      || '';
+  document.getElementById('ef-desc').value    = ev.description  || '';
+  // set category buttons
+  document.querySelectorAll('.ef-cat-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.cat === (ev.category||''));
+  });
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal(){
+  document.getElementById('edit-modal').classList.remove('open');
+  editingEventId = null;
+}
+
+async function saveEditModal(){
+  if(!editingEventId) return;
+  const ev = events.find(e=>e.id===editingEventId);
+  if(!ev) return;
+
+  ev.title       = document.getElementById('ef-title').value.trim()   || ev.title;
+  ev.date        = document.getElementById('ef-date').value            || ev.date;
+  ev.time        = document.getElementById('ef-time').value;
+  ev.timeEnd     = document.getElementById('ef-timeEnd').value;
+  ev.description = document.getElementById('ef-desc').value.trim();
+  const activeCat = document.querySelector('.ef-cat-btn.active');
+  ev.category = activeCat ? activeCat.dataset.cat : '';
+
+  await dbPut('events', ev);
+
+  const btn = document.getElementById('ef-save-btn');
+  const orig = btn.textContent;
+  btn.textContent = 'ZAPISANO ✓';
+  btn.style.cssText += 'background:rgba(0,255,179,.15);border-color:rgba(0,255,179,.4);color:var(--g)';
+  setTimeout(()=>{ btn.textContent=orig; btn.style.cssText=''; }, 1000);
+
+  closeEditModal();
+  renderDrawerList(currentDrawerDate);
+  renderCalView();
+}
+
+function selectCat(btn){
+  document.querySelectorAll('.ef-cat-btn').forEach(b=>b.classList.remove('active'));
+  // toggle off if same
+  if(btn._wasActive){ btn._wasActive=false; return; }
+  btn.classList.add('active');
+  document.querySelectorAll('.ef-cat-btn').forEach(b=>{ b._wasActive = b===btn && b.classList.contains('active'); });
 }
 </script>
 <script>
@@ -3434,130 +3083,53 @@ if('serviceWorker' in navigator){
   });
 }
 
-
-// ── iPhone 16 / iOS specific JS ──────────────────────────────────
-
-// 1. Visual viewport resize handler (keyboard open/close)
-// iOS doesn't resize window when keyboard opens — use visualViewport API
-if (window.visualViewport) {
-  let lastVH = window.visualViewport.height;
-  window.visualViewport.addEventListener('resize', () => {
-    const vh = window.visualViewport.height;
-    const diff = lastVH - vh;
-    // keyboard opened (viewport shrank significantly)
-    if (diff > 100) {
-      // scroll chat to bottom when keyboard opens
-      const chat = document.getElementById('chat-messages');
-      if (chat) setTimeout(() => chat.scrollTop = chat.scrollHeight, 100);
-    }
-    lastVH = vh;
-    // Update --dvh for any vh-based calculations
-    document.documentElement.style.setProperty('--dvh', vh + 'px');
+// ── iPhone 16 JS ─────────────────────────────────────────────────
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',()=>{
+    const chat=document.getElementById('chat-messages');
+    if(chat) setTimeout(()=>chat.scrollTop=chat.scrollHeight,100);
   });
-  // Set initial
-  document.documentElement.style.setProperty('--dvh', window.visualViewport.height + 'px');
 }
-
-// 2. Prevent double-tap zoom on buttons (iOS legacy)
-document.addEventListener('dblclick', e => {
-  if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-    e.preventDefault();
-  }
-}, { passive: false });
-
-// 3. Prevent pinch-zoom (already disabled via meta but belt-and-suspenders)
-document.addEventListener('touchmove', e => {
-  if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
-
-// 4. Momentum scroll fix — allow scrollable containers
-const scrollables = [
-  '#chat-messages', '.notes-list-inner', '.cal-body',
-  '.data-scroll', '#tasks-scroll', '.cal-week-body', '.cal-day-body',
-  '.cal-drawer', '.notes-body-input'
-];
-document.addEventListener('touchstart', e => {
-  const inScrollable = scrollables.some(sel => e.target.closest(sel));
-  if (!inScrollable) {
-    // outside scrollable — allow tap, prevent scroll
-  }
-}, { passive: true });
-
-// 5. Auto-dismiss keyboard when tapping outside input/textarea
-document.addEventListener('touchend', e => {
-  const isInput = e.target.matches('input, textarea') || e.target.closest('input, textarea');
-  if (!isInput && document.activeElement.matches('input, textarea')) {
-    document.activeElement.blur();
-  }
-}, { passive: true });
-
-// 6. Fix iOS bounce on #app container
-const app = document.getElementById('app');
-if (app) {
-  app.addEventListener('touchmove', e => {
-    // Allow scrolling inside scrollable children
-    const inScrollable = scrollables.some(sel => e.target.closest(sel));
-    if (!inScrollable) e.preventDefault();
-  }, { passive: false });
-}
-
-// 7. iPhone haptic feedback via vibration API (works on some iOS builds)
-function haptic(type) {
-  if (!navigator.vibrate) return;
-  if (type === 'light') navigator.vibrate(5);
-  else if (type === 'medium') navigator.vibrate(10);
-  else if (type === 'success') navigator.vibrate([5, 50, 5]);
-}
-
-// Patch sendMsg to add haptic
-const _origSend = window.sendMsg || sendMsg;
-window.sendMsg = async function() {
-  haptic('light');
-  return _origSend.apply(this, arguments);
-};
-
-// Patch toggleTask for haptic
-const _origToggle = window.toggleTask || toggleTask;
-window.toggleTask = async function(id) {
-  haptic('success');
-  return _origToggle.apply(this, arguments);
-};
-
-// 8. Show "Add to Home Screen" prompt if on iOS Safari (not PWA)
-function showAddToHomePrompt() {
-  if (!isIOS()) return;
-  if (isStandalone()) return;
-  if (localStorage.getItem('jarvis_a2hs_dismissed')) return;
-
-  const banner = document.createElement('div');
-  banner.style.cssText = [
-    'position:fixed', 'bottom:calc(env(safe-area-inset-bottom,34px) + 80px)',
-    'left:16px', 'right:16px', 'z-index:99999',
-    'background:rgba(11,21,32,.97)', 'border:1px solid rgba(0,229,255,.35)',
-    'border-radius:14px', 'padding:14px 16px',
-    'font-family:var(--font-body)', 'font-size:13px',
-    'color:var(--text)', 'line-height:1.5',
-    'box-shadow:0 8px 32px rgba(0,0,0,.5)',
-    'display:flex', 'align-items:center', 'gap:12px'
-  ].join(';');
-  banner.innerHTML = `
-    <span style="font-size:24px;flex-shrink:0">◈</span>
-    <div style="flex:1">
-      <strong style="color:var(--c);font-family:var(--font-mono);font-size:11px;letter-spacing:.15em">DODAJ DO EKRANU GŁÓWNEGO</strong><br>
-      Safari → <span style="color:var(--c)">Udostępnij</span> → <span style="color:var(--c)">Dodaj do ekranu głównego</span><br>
-      <span style="font-size:11px;color:var(--text3)">Dla pełnego ekranu i powiadomień</span>
-    </div>
-    <button onclick="this.parentElement.remove();localStorage.setItem('jarvis_a2hs_dismissed','1')"
-      style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;min-width:44px;min-height:44px">✕</button>
-  `;
-  document.body.appendChild(banner);
-  // auto-hide after 12s
-  setTimeout(() => banner.remove(), 12000);
-}
-
-// Show prompt 2s after load
-setTimeout(showAddToHomePrompt, 2000);
+document.addEventListener('touchmove',e=>{
+  if(e.touches.length>1) e.preventDefault();
+},{passive:false});
+document.addEventListener('touchend',e=>{
+  const isInput=e.target.matches('input,textarea')||e.target.closest('input,textarea');
+  if(!isInput&&document.activeElement.matches('input,textarea')) document.activeElement.blur();
+},{passive:true});
 
 </script>
+
+  <!-- EDIT MODAL -->
+  <div id="edit-modal" class="edit-modal-overlay" onclick="if(event.target===this)closeEditModal()">
+    <div class="edit-modal-box">
+      <div class="edit-modal-hdr">
+        <span class="edit-modal-title">EDYTUJ WYDARZENIE</span>
+        <button class="edit-modal-close" onclick="closeEditModal()">✕</button>
+      </div>
+      <div class="edit-fields">
+        <label class="ef-label">TYTUŁ</label>
+        <input class="ef-input" id="ef-title" type="text" placeholder="Tytuł wydarzenia">
+        <label class="ef-label">DATA</label>
+        <input class="ef-input" id="ef-date" type="date">
+        <div class="ef-row">
+          <div><label class="ef-label">GODZINA (od)</label><input class="ef-input" id="ef-time" type="time"></div>
+          <div><label class="ef-label">GODZINA (do)</label><input class="ef-input" id="ef-timeEnd" type="time"></div>
+        </div>
+        <label class="ef-label">OPIS</label>
+        <textarea class="ef-input ef-textarea" id="ef-desc" placeholder="Opis (opcjonalnie)"></textarea>
+        <label class="ef-label">KATEGORIA</label>
+        <div class="ef-cat-row">
+          <button class="ef-cat-btn" data-cat="praca"     onclick="selectCat(this)">💼 PRACA</button>
+          <button class="ef-cat-btn" data-cat="wyjscia"   onclick="selectCat(this)">🚶 WYJŚCIA</button>
+          <button class="ef-cat-btn" data-cat="obowiazki" onclick="selectCat(this)">📋 OBOWIĄZKI</button>
+        </div>
+      </div>
+      <div class="edit-modal-footer">
+        <button class="ef-btn-cancel" onclick="closeEditModal()">ANULUJ</button>
+        <button class="ef-btn-save" id="ef-save-btn" onclick="saveEditModal()">ZAPISZ ✓</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
