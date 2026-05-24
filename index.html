@@ -142,6 +142,16 @@ header::after {
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 .status-text { font-family: var(--font-mono); font-size: 9px; letter-spacing: .2em; color: var(--g); }
 
+.notif-bell {
+  background: transparent; border: 1px solid rgba(0,229,255,.2);
+  color: var(--text3); border-radius: 6px;
+  padding: 7px 10px; cursor: pointer; font-size: 16px;
+  transition: all .2s; min-width: 44px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+.notif-bell:active { background: rgba(0,229,255,.1); }
+.notif-bell.enabled { color: var(--c); border-color: rgba(0,229,255,.45); }
+.notif-bell.denied  { color: var(--r); border-color: rgba(255,77,109,.3); }
 .reset-key {
   background: transparent; border: 1px solid rgba(255,77,109,.2);
   color: rgba(255,77,109,.45); border-radius: 6px;
@@ -771,59 +781,72 @@ nav::-webkit-scrollbar { display: none; }
 
 /* ── Task add form ── */
 .tasks-add-form {
-  padding: 12px 14px 10px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--border);
-  background: rgba(7,14,20,.9);
+  background: rgba(4,8,12,.97);
   flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 7px;
 }
+.tasks-add-title-row { display: none; }
 .tasks-add-row { display: flex; gap: 8px; align-items: center; }
 .tasks-add-input {
-  flex: 1; background: rgba(0,229,255,.05);
-  border: 1px solid rgba(0,229,255,.2); border-radius: 10px;
-  padding: 11px 14px; color: var(--c);
+  flex: 1; background: rgba(0,229,255,.04);
+  border: 1px solid rgba(0,229,255,.18); border-radius: 12px;
+  padding: 11px 14px; color: var(--text);
   font-family: var(--font-body); font-size: 15px;
-  outline: none; caret-color: var(--c); transition: border-color .2s;
+  outline: none; caret-color: var(--c); transition: border-color .2s, box-shadow .2s;
   -webkit-appearance: none;
 }
-.tasks-add-input:focus { border-color: rgba(0,229,255,.5); }
+.tasks-add-input:focus { border-color: rgba(0,229,255,.5); box-shadow: 0 0 14px rgba(0,229,255,.08); }
 .tasks-add-input::placeholder { color: var(--text3); }
 .tasks-add-btn {
-  width: 42px; height: 42px; border-radius: 50%;
+  width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
   background: rgba(0,229,255,.12); border: 1px solid rgba(0,229,255,.4);
   color: var(--c); font-size: 22px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: all .15s;
+  transition: all .15s; line-height: 1;
 }
 .tasks-add-btn:active { background: rgba(0,229,255,.28); transform: scale(.92); }
-.tasks-add-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 10px; }
-.task-prio-select { display: flex; gap: 4px; }
+.tasks-add-btn.open { background: rgba(255,77,109,.1); border-color: rgba(255,77,109,.4); color: var(--r); font-size: 16px; }
+
+/* priority + date row — compact */
+.tasks-add-meta { display: flex; align-items: center; gap: 6px; }
+.tasks-add-meta-label { display: none; }
+.task-prio-select { display: flex; gap: 3px; }
 .tps-btn {
-  padding: 5px 11px; border-radius: 20px; cursor: pointer;
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em;
+  padding: 5px 10px; border-radius: 8px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .08em;
   border: 1px solid var(--border); background: transparent; color: var(--text3);
   transition: all .15s;
 }
-.tps-btn[data-p="high"].active  { background: rgba(255,77,109,.12); border-color: rgba(255,77,109,.5); color: var(--r); }
-.tps-btn[data-p="medium"].active{ background: rgba(255,209,102,.1); border-color: rgba(255,209,102,.5); color: var(--y); }
-.tps-btn[data-p="low"].active   { background: rgba(0,255,179,.08); border-color: rgba(0,255,179,.4); color: var(--g); }
+.tps-btn[data-p="high"].active  { background: rgba(255,77,109,.14); border-color: rgba(255,77,109,.55); color: var(--r); }
+.tps-btn[data-p="medium"].active{ background: rgba(255,209,102,.1); border-color: rgba(255,209,102,.55); color: var(--y); }
+.tps-btn[data-p="low"].active   { background: rgba(0,255,179,.08); border-color: rgba(0,255,179,.45); color: var(--g); }
+
+/* hide inline prio pills on cards */
+.task-card-prio-row { display: none; }
+.task-prio-pill { display: none; }
+
+/* collapsible opts panel */
+.task-opts-panel {
+  display: none; flex-direction: column; gap: 8px;
+  padding: 8px 4px 2px;
+}
+.task-opts-panel.open { display: flex; }
+.task-opts-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.task-opts-label {
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .2em;
+  color: var(--text3); flex-shrink: 0; width: 56px;
+}
 .tasks-add-date {
-  background: rgba(0,229,255,.04); border: 1px solid rgba(0,229,255,.15);
-  border-radius: 8px; padding: 5px 10px;
-  font-size: 12px; font-family: var(--font-mono);
+  background: transparent; border: 1px solid rgba(0,229,255,.15);
+  border-radius: 8px; padding: 6px 10px;
+  font-size: 11px; font-family: var(--font-mono);
   outline: none; -webkit-appearance: none; cursor: pointer;
-  color-scheme: dark; color: var(--text3);
+  color-scheme: dark; color: var(--text2);
 }
-/* task card inline prio pills */
-.task-card-prio-row { display: flex; gap: 4px; margin-top: 8px; padding-left: 27px; }
-.task-prio-pill {
-  padding: 3px 9px; border-radius: 20px; cursor: pointer;
-  font-family: var(--font-mono); font-size: 8px; letter-spacing: .1em;
-  border: 1px solid var(--border); background: transparent; color: var(--text3);
-  transition: all .12s;
-}
-.task-prio-pill.sel-high  { background: rgba(255,77,109,.12); border-color: rgba(255,77,109,.5); color: var(--r); }
-.task-prio-pill.sel-medium{ background: rgba(255,209,102,.1); border-color: rgba(255,209,102,.5); color: var(--y); }
-.task-prio-pill.sel-low   { background: rgba(0,255,179,.08); border-color: rgba(0,255,179,.4); color: var(--g); }
 
 /* ── Cal toolbar right ── */
 .cal-toolbar { justify-content: space-between; }
@@ -934,96 +957,123 @@ nav::-webkit-scrollbar { display: none; }
 
 /* ── Notes layout ── */
 .notes-layout {
-  display: flex; flex: 1; overflow: hidden;
+  display: flex; flex-direction: column; flex: 1; overflow: hidden;
 }
-.notes-sidebar {
-  width: 220px; flex-shrink: 0;
-  border-right: 1px solid var(--border);
-  background: rgba(7,14,20,.85);
-  display: flex; flex-direction: column;
-  overflow: hidden;
+
+/* ── Notes list view ── */
+.notes-list-view {
+  display: flex; flex-direction: column; flex: 1; overflow: hidden;
 }
-.notes-sidebar-hdr {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px 8px;
+.notes-list-view.hidden { display: none; }
+
+.notes-list-topbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px 10px;
   border-bottom: 1px solid var(--border);
+  background: rgba(4,8,12,.97);
   flex-shrink: 0;
 }
+.notes-list-topbar .section-title { flex: 1; }
 .notes-new-btn {
+  width: 40px; height: 40px;
   background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.35);
-  color: var(--c); width: 26px; height: 26px; border-radius: 4px;
-  cursor: pointer; font-size: 18px; line-height: 1;
+  color: var(--c); border-radius: 10px;
+  cursor: pointer; font-size: 22px; line-height: 1;
   display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
+  transition: all .15s; flex-shrink: 0;
 }
-.notes-new-btn:hover { background: rgba(0,229,255,.22); box-shadow: 0 0 12px rgba(0,229,255,.2); }
+.notes-new-btn:active { background: rgba(0,229,255,.25); transform: scale(.92); }
+
 .notes-search {
-  margin: 8px 10px; padding: 7px 10px;
-  background: rgba(0,229,255,.04); border: 1px solid rgba(0,229,255,.15);
-  border-radius: 4px; color: var(--text); font-size: 12px; outline: none;
+  margin: 0 14px 12px;
+  padding: 10px 14px 10px 36px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px; color: var(--text); font-size: 15px; outline: none;
   font-family: var(--font-body); flex-shrink: 0;
-  transition: border-color .2s;
+  transition: border-color .2s; width: calc(100% - 28px);
+  -webkit-appearance: none; margin-top: 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(120,160,180,.4)' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 12px center;
 }
-.notes-search:focus { border-color: rgba(0,229,255,.4); }
+.notes-search:focus { border-color: rgba(0,229,255,.35); background-color: rgba(0,229,255,.04); }
 .notes-search::placeholder { color: var(--text3); }
+
 .notes-list-inner {
   flex: 1; overflow-y: auto;
-  padding: 4px 6px 10px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
-.notes-list-inner::-webkit-scrollbar { width: 2px; }
-.note-item {
-  padding: 9px 10px; border-radius: 4px; cursor: pointer;
-  border: 1px solid transparent; margin-bottom: 3px;
-  transition: all .15s;
-}
-.note-item:hover { background: rgba(0,229,255,.05); border-color: rgba(0,229,255,.12); }
-.note-item.active { background: rgba(0,229,255,.1); border-color: rgba(0,229,255,.35); }
-.note-item-row { display: flex; align-items: center; gap: 6px; }
-.note-item-del {
-  background: transparent; border: none; color: rgba(255,77,109,.25);
-  font-size: 14px; cursor: pointer; padding: 4px 6px; border-radius: 6px;
-  flex-shrink: 0; transition: all .15s; opacity: 0;
-}
-.note-item:hover .note-item-del { opacity: 1; }
-.note-item-del:hover { color: var(--r); background: rgba(255,77,109,.08); }
+.notes-list-inner::-webkit-scrollbar { display: none; }
 
+.note-item {
+  padding: 14px 16px; cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background .12s;
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+}
+.note-item:active { background: rgba(0,229,255,.06); }
+.note-item.active { background: rgba(0,229,255,.07); }
+
+.note-item-body { flex: 1; min-width: 0; }
 .note-item-title {
-  font-size: 12px; font-weight: 600; color: var(--text);
+  font-size: 15px; font-weight: 600; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 .note-item-preview {
-  font-size: 10px; color: var(--text3);
+  font-size: 13px; color: var(--text3);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  font-family: var(--font-mono); letter-spacing: .04em;
 }
 .note-item-date {
-  font-size: 9px; color: rgba(120,180,210,.22);
+  font-size: 11px; color: rgba(120,180,210,.35);
   font-family: var(--font-mono); margin-top: 4px;
 }
+.note-item-del {
+  background: rgba(255,77,109,.08); border: 1px solid rgba(255,77,109,.25);
+  color: var(--r); font-size: 13px; cursor: pointer;
+  padding: 6px 10px; border-radius: 8px; flex-shrink: 0;
+  transition: all .15s;
+}
+.note-item-del:active { background: rgba(255,77,109,.2); }
 
-/* editor */
-.notes-editor {
-  flex: 1; display: flex; flex-direction: column; overflow: hidden;
-  background: rgba(4,8,12,.6);
-}
-.notes-editor-empty {
+.notes-empty-state {
   flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  align-items: center; justify-content: center; gap: 12px;
+  padding: 40px 24px;
 }
-.notes-editor-inner {
-  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+.notes-empty-state .empty-icon { font-size: 48px; opacity: .2; }
+.notes-empty-state p {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em;
+  color: var(--text3); text-align: center;
 }
+
+/* ── Notes editor view (full screen on mobile) ── */
+.notes-editor-view {
+  display: none; flex-direction: column; flex: 1; overflow: hidden;
+  background: rgba(4,8,12,.98);
+}
+.notes-editor-view.visible { display: flex; }
+
 .notes-editor-topbar {
   display: flex; align-items: center; gap: 10px;
-  padding: 12px 18px 8px; border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; background: rgba(4,8,12,.97);
+}
+.notes-back-btn {
+  background: transparent; border: none; color: var(--c);
+  font-size: 15px; cursor: pointer; padding: 6px 10px 6px 2px;
+  display: flex; align-items: center; gap: 4px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em;
   flex-shrink: 0;
 }
+.notes-back-btn:active { opacity: .6; }
 .notes-title-input {
   flex: 1; background: transparent; border: none; outline: none;
-  color: var(--text); font-size: 17px; font-weight: 600;
-  font-family: var(--font-body); letter-spacing: .01em;
-  caret-color: var(--c);
+  color: var(--text); font-size: 16px; font-weight: 600;
+  font-family: var(--font-body);
+  caret-color: var(--c); min-width: 0;
 }
 .notes-title-input::placeholder { color: var(--text3); }
 .notes-editor-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -1033,68 +1083,66 @@ nav::-webkit-scrollbar { display: none; }
 }
 .notes-save-indicator.show { opacity: 1; }
 .notes-del-btn {
-  background: transparent; border: 1px solid transparent;
-  color: rgba(255,77,109,.3); cursor: pointer; font-size: 14px;
-  padding: 3px 7px; border-radius: 4px; transition: all .15s;
+  background: transparent; border: none;
+  color: rgba(255,77,109,.4); cursor: pointer; font-size: 18px;
+  padding: 6px 8px; border-radius: 8px; transition: all .15s;
+  min-width: 40px; min-height: 40px; display: flex; align-items: center; justify-content: center;
 }
-.notes-del-btn:hover { color: var(--r); background: rgba(255,77,109,.08); border-color: rgba(255,77,109,.2); }
+.notes-del-btn:active { color: var(--r); background: rgba(255,77,109,.1); }
 .notes-body-input {
   flex: 1; background: transparent; border: none; outline: none; resize: none;
-  color: var(--text); font-size: 14px; line-height: 1.75;
-  font-family: var(--font-body); padding: 16px 20px;
-  caret-color: var(--c);
+  color: var(--text); font-size: 16px; line-height: 1.8;
+  font-family: var(--font-body); padding: 16px 18px;
+  caret-color: var(--c); -webkit-overflow-scrolling: touch;
 }
 .notes-body-input::placeholder { color: var(--text3); }
 .notes-editor-footer {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 6px 20px 10px;
+  padding: 8px 18px 10px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
+/* old sidebar — hide it */
+.notes-sidebar, .notes-editor { display: none !important; }
 
 /* ── Tasks toolbar ── */
 .tasks-toolbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 16px 8px; border-bottom: 1px solid var(--border);
-  background: rgba(7,14,20,.85); flex-shrink: 0; gap: 10px; flex-wrap: wrap;
+  display: flex; align-items: center;
+  padding: 7px 12px; border-bottom: 1px solid var(--border);
+  background: rgba(7,14,20,.85); flex-shrink: 0; gap: 6px;
 }
-.tasks-filters { display: flex; gap: 3px; }
+.tasks-filters { display: flex; gap: 2px; }
 .task-filter-btn {
-  padding: 5px 12px; background: transparent;
+  padding: 4px 10px; background: transparent;
   border: 1px solid transparent; border-radius: 4px;
-  font-family: var(--font-mono); font-size: 8px; letter-spacing: .16em;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .12em;
   color: var(--text3); cursor: pointer; transition: all .15s;
 }
-.task-filter-btn:hover { color: var(--c); border-color: rgba(0,229,255,.2); }
-.task-filter-btn.active { color: var(--c); background: rgba(0,229,255,.1); border-color: rgba(0,229,255,.35); }
-.tasks-priority-filter { display: flex; gap: 3px; }
+.task-filter-btn:hover { color: var(--c); }
+.task-filter-btn.active { color: var(--c); background: rgba(0,229,255,.1); border-color: rgba(0,229,255,.3); }
+.tasks-priority-filter { display: flex; gap: 2px; margin-left: auto; }
 .task-prio-btn {
-  padding: 4px 10px; border-radius: 4px; cursor: pointer;
-  font-family: var(--font-mono); font-size: 8px; letter-spacing: .12em;
+  padding: 4px 8px; border-radius: 4px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .08em;
   border: 1px solid transparent; background: transparent; color: var(--text3);
   transition: all .15s;
 }
-.task-prio-btn:hover { background: rgba(0,229,255,.06); color: var(--text); }
-.task-prio-btn.active { background: rgba(0,229,255,.1); border-color: rgba(0,229,255,.3); color: var(--c); }
-.task-prio-btn.high.active { background: rgba(255,77,109,.1); border-color: rgba(255,77,109,.35); color: var(--r); }
-.task-prio-btn.med.active  { background: rgba(255,209,102,.08); border-color: rgba(255,209,102,.35); color: var(--y); }
-.task-prio-btn.low.active  { background: rgba(0,255,179,.07); border-color: rgba(0,255,179,.3); color: var(--g); }
+.task-prio-btn:hover { color: var(--text); }
+.task-prio-btn.active { background: rgba(0,229,255,.1); border-color: rgba(0,229,255,.25); color: var(--c); }
+.task-prio-btn.high.active { background: rgba(255,77,109,.1); border-color: rgba(255,77,109,.3); color: var(--r); }
+.task-prio-btn.med.active  { background: rgba(255,209,102,.08); border-color: rgba(255,209,102,.3); color: var(--y); }
+.task-prio-btn.low.active  { background: rgba(0,255,179,.07); border-color: rgba(0,255,179,.25); color: var(--g); }
 
-/* progress */
+/* progress — slim, no label */
 .tasks-progress-bar-wrap {
-  height: 3px; background: rgba(0,229,255,.07);
-  position: relative; flex-shrink: 0; overflow: visible;
+  height: 2px; background: rgba(0,229,255,.06);
+  flex-shrink: 0;
 }
 .tasks-progress-bar {
   height: 100%; background: linear-gradient(90deg, var(--g), var(--c));
   transition: width .4s ease;
-  box-shadow: 0 0 8px rgba(0,255,179,.4);
 }
-.tasks-progress-label {
-  position: absolute; right: 14px; top: 4px;
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: .15em;
-  color: var(--g);
-}
+.tasks-progress-label { display: none; }
 
 /* task cards enhanced */
 .task-card {
@@ -1177,6 +1225,7 @@ nav::-webkit-scrollbar { display: none; }
         <span class="status-text" id="status-text">ONLINE</span>
       </div>
       <button class="reset-key" onclick="resetApiKey()" title="Zmień klucz API">🔑</button>
+      <button class="notif-bell" id="notif-bell" onclick="requestNotifPermission()" title="Włącz powiadomienia">🔔</button>
     </div>
   </header>
 
@@ -1207,9 +1256,9 @@ nav::-webkit-scrollbar { display: none; }
     </div>
     <div class="input-bar">
       <button id="mic-btn" onclick="toggleMic()" title="Nagrywanie głosu">🎤</button>
-      <input id="msg-input" type="text"
+      <textarea id="msg-input" rows="1"
         placeholder="Wpisz wiadomość lub użyj mikrofonu..."
-        onkeydown="if(event.key==='Enter')sendMsg()">
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
       <button id="send-btn" onclick="sendMsg()">→</button>
     </div>
   </div>
@@ -1217,36 +1266,37 @@ nav::-webkit-scrollbar { display: none; }
   <!-- NOTES -->
   <div class="panel" id="panel-notes">
     <div class="notes-layout">
-      <!-- sidebar: list -->
-      <div class="notes-sidebar" id="notes-sidebar">
-        <div class="notes-sidebar-hdr">
+
+      <!-- LIST VIEW -->
+      <div class="notes-list-view" id="notes-list-view">
+        <div class="notes-list-topbar">
           <span class="section-title">// NOTATKI</span>
           <button class="notes-new-btn" onclick="newNote()" title="Nowa notatka">＋</button>
         </div>
-        <input class="notes-search" id="notes-search" type="text" placeholder="Szukaj..." oninput="filterNotes(this.value)">
+        <input class="notes-search" id="notes-search" type="text"
+          placeholder="Szukaj notatek..." oninput="filterNotes(this.value)">
         <div class="notes-list-inner" id="notes-list"></div>
       </div>
-      <!-- editor -->
-      <div class="notes-editor" id="notes-editor">
-        <div class="notes-editor-empty" id="notes-editor-empty">
-          <span style="font-size:32px;opacity:.2">📝</span>
-          <div style="margin-top:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;color:var(--text3)">WYBIERZ LUB UTWÓRZ NOTATKĘ</div>
+
+      <!-- EDITOR VIEW (full screen) -->
+      <div class="notes-editor-view" id="notes-editor-view">
+        <div class="notes-editor-topbar">
+          <button class="notes-back-btn" onclick="closeNoteEditor()">‹ Notatki</button>
+          <input class="notes-title-input" id="note-title-input" type="text"
+            placeholder="Tytuł..." oninput="noteChanged()">
+          <div class="notes-editor-actions">
+            <span class="notes-save-indicator" id="notes-save-indicator"></span>
+            <button class="notes-del-btn" onclick="deleteCurrentNote()">🗑</button>
+          </div>
         </div>
-        <div class="notes-editor-inner" id="notes-editor-inner" style="display:none">
-          <div class="notes-editor-topbar">
-            <input class="notes-title-input" id="note-title-input" type="text" placeholder="Tytuł notatki..." oninput="noteChanged()">
-            <div class="notes-editor-actions">
-              <span class="notes-save-indicator" id="notes-save-indicator"></span>
-              <button class="notes-del-btn" id="note-del-btn" onclick="deleteCurrentNote()">🗑</button>
-            </div>
-          </div>
-          <textarea class="notes-body-input" id="note-body-input" placeholder="Zacznij pisać..." oninput="noteChanged()"></textarea>
-          <div class="notes-editor-footer">
-            <span id="note-footer-meta" class="card-meta"></span>
-            <span id="note-char-count" class="card-meta"></span>
-          </div>
+        <textarea class="notes-body-input" id="note-body-input"
+          placeholder="Zacznij pisać..." oninput="noteChanged()"></textarea>
+        <div class="notes-editor-footer">
+          <span id="note-footer-meta" class="card-meta"></span>
+          <span id="note-char-count" class="card-meta"></span>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -1316,16 +1366,24 @@ nav::-webkit-scrollbar { display: none; }
     <!-- Add task form -->
     <div class="tasks-add-form" id="tasks-add-form">
       <div class="tasks-add-row">
-        <input class="tasks-add-input" id="task-add-input" type="text" placeholder="Nowe zadanie..." onkeydown="if(event.key==='Enter')addTaskManual()">
-        <button class="tasks-add-btn" onclick="addTaskManual()">＋</button>
+        <input class="tasks-add-input" id="task-add-input" type="text"
+          placeholder="Nowe zadanie..."
+          onkeydown="if(event.key==='Enter')addTaskManual()">
+        <button class="tasks-add-btn" id="task-opts-btn" onclick="toggleTaskOpts()">＋</button>
       </div>
-      <div class="tasks-add-meta">
-        <div class="task-prio-select" id="task-prio-select">
-          <button class="tps-btn active" data-p="low"    onclick="selectNewPrio('low',this)">● LOW</button>
-          <button class="tps-btn"        data-p="medium" onclick="selectNewPrio('medium',this)">● MED</button>
-          <button class="tps-btn"        data-p="high"   onclick="selectNewPrio('high',this)">● HIGH</button>
+      <div class="task-opts-panel" id="task-opts-panel">
+        <div class="task-opts-row">
+          <span class="task-opts-label">PRIORYTET</span>
+          <div class="task-prio-select" id="task-prio-select">
+            <button class="tps-btn" data-p="low"    onclick="selectNewPrio('low',this)">↓ NISKI</button>
+            <button class="tps-btn active" data-p="medium" onclick="selectNewPrio('medium',this)">→ ŚREDNI</button>
+            <button class="tps-btn" data-p="high"   onclick="selectNewPrio('high',this)">↑ WYSOKI</button>
+          </div>
         </div>
-        <input class="tasks-add-date" id="task-add-date" type="date" title="Termin (opcjonalnie)">
+        <div class="task-opts-row">
+          <span class="task-opts-label">TERMIN</span>
+          <input class="tasks-add-date" id="task-add-date" type="date" title="Termin (opcjonalnie)">
+        </div>
       </div>
     </div>
     <div class="tasks-toolbar">
@@ -1334,12 +1392,7 @@ nav::-webkit-scrollbar { display: none; }
         <button class="task-filter-btn" onclick="setTaskFilter('active',this)">AKTYWNE</button>
         <button class="task-filter-btn" onclick="setTaskFilter('done',this)">UKOŃCZONE</button>
       </div>
-      <div class="tasks-priority-filter">
-        <button class="task-prio-btn active" onclick="setTaskPrio('all',this)">●●●</button>
-        <button class="task-prio-btn high" onclick="setTaskPrio('high',this)">● H</button>
-        <button class="task-prio-btn med" onclick="setTaskPrio('medium',this)">● M</button>
-        <button class="task-prio-btn low" onclick="setTaskPrio('low',this)">● L</button>
-      </div>
+
     </div>
     <div class="tasks-progress-bar-wrap" id="tasks-progress-wrap">
       <div class="tasks-progress-bar" id="tasks-progress-bar"></div>
@@ -1389,6 +1442,7 @@ function saveApiKey(){
   loadAll().then(()=>{
     switchTab('chat', document.querySelector('.nav-btn'));
     addBotMsg('chat','Witaj. Jestem J.A.R.V.I.S. — zasilany Llama 3.3 70B.\n\nMogę:\n• 📝 Zapisywać notatki\n• 📅 Zarządzać Twoim kalendarzem\n• ✅ Tworzyć i śledzić zadania\n• ☀ Generować raporty i plany dnia\n\nPo prostu napisz co chcesz zrobić.');
+    initNotifications();
   });
 }
 
@@ -1406,6 +1460,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     loadAll().then(()=>{
       switchTab('chat', document.querySelector('.nav-btn'));
       addBotMsg('chat','Witaj z powrotem. Jestem J.A.R.V.I.S.\n\nMogę:\n• 📝 Zapisywać notatki\n• 📅 Zarządzać Twoim kalendarzem\n• ✅ Tworzyć i śledzić zadania\n• ☀ Generować raporty i plany dnia\n\nPo prostu napisz co chcesz zrobić.');
+      initNotifications();
     });
   }
 });
@@ -1455,33 +1510,41 @@ function buildClassifySys(){
   const eventsSummary=events.map(e=>({id:e.id,title:e.title,date:e.date,time:e.time||''}));
   const tasksSummary=tasks.map(t=>({id:t.id,title:t.title,priority:t.priority,done:t.done,dueDate:t.dueDate||''}));
 
-  return `Jesteś JARVIS. Odpowiedz TYLKO poprawną tablicą JSON, bez markdown, bez komentarzy.
+  return `Jesteś JARVIS. Odpowiedz TYLKO poprawną tablicą JSON. Zero markdown, zero komentarzy, zero tekstu poza JSON.
 
-Użytkownik może poprosić o kilka rzeczy naraz — zawsze zwróć TABLICĘ obiektów, nawet jeśli jest jedna akcja.
+Użytkownik może poprosić o kilka rzeczy naraz — zawsze zwróć TABLICĘ obiektów JSON.
 
-AKTUALNE DANE UŻYTKOWNIKA (użyj id do usuwania/edytowania):
+DANE UŻYTKOWNIKA (używaj id przy usuwaniu/edytowaniu):
 Notatki: ${JSON.stringify(notesSummary)}
 Wydarzenia: ${JSON.stringify(eventsSummary)}
 Zadania: ${JSON.stringify(tasksSummary)}
 
-Dostępne intenty: "note" | "event" | "task" | "delete_note" | "delete_event" | "delete_task" | "update_task" | "update_event" | "report_morning" | "report_evening" | "chat"
+DOSTĘPNE INTENTY:
+note | update_note | delete_note
+event | update_event | delete_event
+task | update_task | delete_task
+list | report_morning | report_evening | chat
 
-Formaty obiektów:
-- note:          {"intent":"note","title":"...","content":"..."}
-- event:         {"intent":"event","title":"...","date":"YYYY-MM-DD","time":"HH:MM","timeEnd":"HH:MM","description":"..."}
-- task:          {"intent":"task","title":"...","priority":"high|medium|low","dueDate":"YYYY-MM-DD lub pusty string"}
-- delete_note:   {"intent":"delete_note","id":123,"title":"..."}
-- delete_event:  {"intent":"delete_event","id":123,"title":"..."}
-- delete_task:   {"intent":"delete_task","id":123,"title":"..."}
-- update_task:   {"intent":"update_task","id":123,"changes":{"title":"...","priority":"...","dueDate":"...","done":true/false}}
-- update_event:  {"intent":"update_event","id":123,"changes":{"title":"...","date":"...","time":"...","description":"..."}}
-- report:        {"intent":"report_morning"} lub {"intent":"report_evening"}
-- chat:          {"intent":"chat","reply":"..."}
+FORMATY:
+- note:           {"intent":"note","title":"...","content":"..."}
+- update_note:    {"intent":"update_note","id":123,"changes":{"title":"...","content":"..."}}
+- delete_note:    {"intent":"delete_note","id":123}
+- event:          {"intent":"event","title":"...","date":"YYYY-MM-DD","time":"HH:MM","timeEnd":"HH:MM","description":"..."}
+- update_event:   {"intent":"update_event","id":123,"changes":{"title":"...","date":"...","time":"...","timeEnd":"...","description":"..."}}
+- delete_event:   {"intent":"delete_event","id":123}
+- task:           {"intent":"task","title":"...","priority":"high|medium|low","dueDate":"YYYY-MM-DD lub \"\""}
+- update_task:    {"intent":"update_task","id":123,"changes":{"title":"...","priority":"...","dueDate":"...","done":true}}
+- delete_task:    {"intent":"delete_task","id":123}
+- list:           {"intent":"list","reply":"...czytelna lista elementów..."}
+- report_morning: {"intent":"report_morning"}
+- report_evening: {"intent":"report_evening"}
+- chat:           {"intent":"chat","reply":"..."}
 
-Jeśli użytkownik prosi o usunięcie czegoś, znajdź pasujący element po nazwie/tytule i użyj jego id.
-Jeśli nie ma pasującego elementu: zwróć {"intent":"chat","reply":"Nie znalazłem..."}
-
-Dzisiaj: ${today}. Odpowiadaj w języku użytkownika.`;
+ZASADY:
+- Usuwanie/edycja: znajdź element po nazwie i użyj jego id. Brak dopasowania → chat z info.
+- "usuń wszystkie X": zwróć tablicę delete dla każdego elementu X.
+- "pokaż/co mam/lista": użyj intent list, w reply podaj czytelną listę.
+- Odpowiadaj w języku użytkownika. Dzisiaj: ${today}.`;
 }
 
 async function classify(text){
@@ -1501,10 +1564,11 @@ async function buildReport(type){
   const todayISO=new Date().toISOString().split('T')[0];
   const todayEvs=events.filter(e=>e.date&&e.date.startsWith(todayISO));
   const pending=tasks.filter(t=>!t.done);
+  const done=tasks.filter(t=>t.done).length;
   const sys=type==='morning'
-    ?`Jesteś JARVIS. Wygeneruj zwięzły motywujący poranny briefing po polsku. Dziś: ${today}. Dzisiejsze wydarzenia: ${JSON.stringify(todayEvs)}. Aktywne zadania: ${JSON.stringify(pending)}. Notatek w bazie: ${notes.length}. Styl energetyczny, konkretny, max 200 słów.`
-    :`Jesteś JARVIS. Wygeneruj wieczorne podsumowanie po polsku. Dziś: ${today}. Dzisiejsze wydarzenia: ${JSON.stringify(todayEvs)}. Ukończone: ${tasks.filter(t=>t.done).length}, aktywne: ${pending.length}. Styl refleksyjny, zachęcający, max 200 słów.`;
-  return await groqCall(sys,'Wygeneruj raport.');
+    ?`Jesteś JARVIS. Poranny briefing — TYLKO konkretne fakty, bez owijania w bawełnę. Dziś: ${today}. Wydarzenia dziś: ${JSON.stringify(todayEvs.map(e=>e.time?e.time+' '+e.title:e.title))}. Aktywne zadania (${pending.length}): ${JSON.stringify(pending.map(t=>t.title))}. Format: 2-3 zdania max. Żadnych wstępów, żadnego "Dzień dobry", żadnych ozdobników.`
+    :`Jesteś JARVIS. Wieczorne podsumowanie — TYLKO fakty. Dziś: ${today}. Ukończono zadań: ${done}, zostało: ${pending.length}. Aktywne: ${JSON.stringify(pending.map(t=>t.title))}. Format: 2-3 zdania max. Żadnych wstępów, żadnych ozdobników.`;
+  return await groqCall(sys,'Wygeneruj raport.',400);
 }
 
 // ── Process single action ─────────────────────────────────────────
@@ -1561,6 +1625,18 @@ async function processAction(r){
     renderCalendar();
     const changes=Object.keys(r.changes||{}).join(', ');
     return {type:'event', msg:`Wydarzenie zaktualizowane ✓\n"${e.title}" — zmieniono: ${changes}`};
+
+  }else if(r.intent==='update_note'){
+    const n=notes.find(x=>x.id===r.id);
+    if(!n) return {type:'chat', msg:`Nie znalazłem notatki o id ${r.id}.`};
+    Object.assign(n, r.changes||{});
+    await dbPut('notes',n);
+    renderNotes();
+    return {type:'note', msg:`Notatka zaktualizowana ✓
+"${n.title}"`};
+
+  }else if(r.intent==='list'){
+    return {type:'chat', msg:r.reply||'Brak danych.'};
 
   }else if(r.intent==='report_morning'||r.intent==='report_evening'){
     const rep=await buildReport(r.intent==='report_morning'?'morning':'evening');
@@ -1646,53 +1722,54 @@ let notesFilterQuery = '';
 function renderNotes(){
   const el=document.getElementById('notes-list');
   document.getElementById('cnt-notes').textContent=notes.length;
-  const q = notesFilterQuery.toLowerCase();
-  const filtered = [...notes].reverse().filter(n=>
-    !q || (n.title||'').toLowerCase().includes(q) || (n.content||'').toLowerCase().includes(q)
+  const q=notesFilterQuery.toLowerCase();
+  const filtered=[...notes].reverse().filter(n=>
+    !q||(n.title||'').toLowerCase().includes(q)||(n.content||'').toLowerCase().includes(q)
   );
   if(!filtered.length){
-    el.innerHTML='<div style="text-align:center;padding:24px 12px;font-family:var(--font-mono);font-size:9px;letter-spacing:.18em;color:var(--text3)">'+(q?'BRAK WYNIKÓW':'BRAK NOTATEK')+'</div>';
+    el.innerHTML=`<div class="notes-empty-state"><span class="empty-icon">📝</span><p>${q?'BRAK WYNIKÓW':'BRAK NOTATEK\nDOTKNIJ ＋ ABY DODAĆ'}</p></div>`;
     return;
   }
   el.innerHTML=filtered.map(n=>`
     <div class="note-item${n.id===currentNoteId?' active':''}" onclick="openNote(${n.id})">
-      <div class="note-item-row">
-        <div style="flex:1;min-width:0">
-          <div class="note-item-title">${esc(n.title||'Bez tytułu')}</div>
-          <div class="note-item-preview">${esc((n.content||'').substring(0,60))}</div>
-          <div class="note-item-date">${new Date(n.createdAt).toLocaleDateString('pl-PL',{day:'numeric',month:'short'})}</div>
-        </div>
-        <button class="note-item-del" onclick="event.stopPropagation();deleteNoteById(${n.id})">🗑</button>
+      <div class="note-item-body">
+        <div class="note-item-title">${esc(n.title||'Bez tytułu')}</div>
+        <div class="note-item-preview">${esc((n.content||'').substring(0,80))}</div>
+        <div class="note-item-date">${new Date(n.createdAt).toLocaleDateString('pl-PL',{day:'numeric',month:'short',year:'numeric'})}</div>
       </div>
+      <button class="note-item-del" onclick="event.stopPropagation();deleteNoteById(${n.id})">🗑</button>
     </div>`).join('');
 }
 
-function filterNotes(q){
-  notesFilterQuery=q;
-  renderNotes();
-}
+function filterNotes(q){ notesFilterQuery=q; renderNotes(); }
 
 function openNote(id){
   currentNoteId=id;
   const n=notes.find(x=>x.id===id);
   if(!n)return;
-  document.getElementById('notes-editor-empty').style.display='none';
-  document.getElementById('notes-editor-inner').style.display='flex';
+  document.getElementById('notes-list-view').classList.add('hidden');
+  document.getElementById('notes-editor-view').classList.add('visible');
   document.getElementById('note-title-input').value=n.title||'';
   document.getElementById('note-body-input').value=n.content||'';
   document.getElementById('note-footer-meta').textContent='Utworzono: '+new Date(n.createdAt).toLocaleString('pl-PL');
   updateNoteCharCount();
   renderNotes();
-  document.getElementById('note-body-input').focus();
+  setTimeout(()=>document.getElementById('note-body-input').focus(),100);
+}
+
+function closeNoteEditor(){
+  document.getElementById('notes-list-view').classList.remove('hidden');
+  document.getElementById('notes-editor-view').classList.remove('visible');
+  currentNoteId=null;
+  renderNotes();
 }
 
 function newNote(){
   dbAdd('notes',{title:'',content:''}).then(id=>{
     const n={id,title:'',content:'',createdAt:new Date().toISOString()};
     notes.unshift(n);
-    renderNotes();
     openNote(id);
-    document.getElementById('note-title-input').focus();
+    setTimeout(()=>document.getElementById('note-title-input').focus(),150);
   });
 }
 
@@ -1716,31 +1793,24 @@ async function saveCurrentNote(){
   await dbPut('notes',n);
   renderNotes();
   const ind=document.getElementById('notes-save-indicator');
-  ind.textContent='✓ ZAPISANO';
-  ind.classList.add('show');
+  ind.textContent='✓ ZAPISANO'; ind.classList.add('show');
   setTimeout(()=>ind.classList.remove('show'),1800);
 }
 
 async function deleteNoteById(id){
-  if(!confirm('Usunąć tę notatkę?')) return;
-  await deleteItem('notes', id);
-  if(currentNoteId===id){
-    currentNoteId=null;
-    document.getElementById('notes-editor-empty').style.display='';
-    document.getElementById('notes-editor-inner').style.display='none';
-  }
+  if(!confirm('Usunąć tę notatkę?'))return;
+  await deleteItem('notes',id);
+  if(currentNoteId===id) closeNoteEditor();
   renderNotes();
 }
 
 async function deleteCurrentNote(){
-  if(!currentNoteId) return;
-  if(!confirm('Usunąć tę notatkę?')) return;
-  await deleteItem('notes', currentNoteId);
-  currentNoteId=null;
-  document.getElementById('notes-editor-empty').style.display='';
-  document.getElementById('notes-editor-inner').style.display='none';
-  renderNotes();
+  if(!currentNoteId)return;
+  if(!confirm('Usunąć tę notatkę?'))return;
+  await deleteItem('notes',currentNoteId);
+  closeNoteEditor();
 }
+
 function renderCalendar(){
   document.getElementById('cnt-cal').textContent=events.length;
   renderCalView();
@@ -1857,7 +1927,7 @@ function renderWeek(){
     const ds=toDateStr(d);
     const isTod=ds===todayStr;
     html+=`<div class="cal-week-col-hdr${isTod?' today-col':''}">
-      <div class="wday">${DAYS_PL[(d.getDay()+6)%7+1>6?0:(d.getDay()+6)%7]}</div>
+      <div class="wday">${DAYS_PL[(d.getDay()+6)%7]}</div>
       <div class="wnum${isTod?' today-num':''}">${d.getDate()}</div>
     </div>`;
   });
@@ -2090,20 +2160,32 @@ function taskCardHTML(t, today){
   const doneClass=t.done?'done-card':'';
   const overdue=t.dueDate&&!t.done&&t.dueDate<today;
   const dueLabel=t.dueDate?`<span class="task-card-due${overdue?' overdue':''}">📅 ${overdue?'⚠ ':''}${t.dueDate}</span>`:'';
-  const prioPills=['low','medium','high'].map(pp=>
-    `<button class="task-prio-pill${p===pp?' sel-'+pp:''}" onclick="changeTaskPrio(${t.id},'${pp}')">${pp==='low'?'LOW':pp==='medium'?'MED':'HIGH'}</button>`
-  ).join('');
+  const prioColors={high:'var(--r)',medium:'var(--y)',low:'var(--g)'};
+  const prioLabel=`<span style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;color:${prioColors[p]};opacity:.7">${p.toUpperCase()}</span>`;
   return `<div class="task-card prio-${p} ${doneClass}" id="tcard-${t.id}">
     <button class="task-card-del" onclick="deleteItem('tasks',${t.id})">✕</button>
     <div class="task-card-row">
       <div class="task-toggle${t.done?' checked':''}" onclick="toggleTask(${t.id})"></div>
       <span class="task-card-title">${esc(t.title)}</span>
     </div>
-    <div class="task-card-prio-row">${prioPills}${dueLabel?`<span style="margin-left:6px">${dueLabel}</span>`:''}</div>
+    ${(dueLabel||!t.done)?`<div style="display:flex;align-items:center;gap:10px;margin-top:5px;padding-left:34px">${prioLabel}${dueLabel}</div>`:''}
   </div>`;
 }
 // ── Manual task add ──
-let newTaskPrio = 'low';
+let newTaskPrio = 'medium';
+
+function toggleTaskOpts(){
+  const inp = document.getElementById('task-add-input');
+  const title = inp.value.trim();
+  // jeśli jest tekst — dodaj zadanie
+  if(title){ addTaskManual(); return; }
+  // jeśli pusty — rozwiń/zwiń opcje
+  const panel = document.getElementById('task-opts-panel');
+  const btn = document.getElementById('task-opts-btn');
+  const open = panel.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.textContent = open ? '✕' : '＋';
+}
 
 function selectNewPrio(p, btn){
   newTaskPrio = p;
@@ -2120,6 +2202,11 @@ async function addTaskManual(){
   tasks.push({id, title, priority: newTaskPrio, dueDate, done: false, createdAt: new Date().toISOString()});
   inp.value = '';
   document.getElementById('task-add-date').value = '';
+  // zamknij panel opcji po dodaniu
+  document.getElementById('task-opts-panel').classList.remove('open');
+  const btn = document.getElementById('task-opts-btn');
+  btn.classList.remove('open');
+  btn.textContent = '＋';
   renderTasks(); renderStats();
 }
 
@@ -2221,6 +2308,204 @@ function toggleMic() {
     document.getElementById('msg-input').dataset.baseText = document.getElementById('msg-input').value;
     recognition.start();
   }
+}
+
+// ════════════════════════════════════════════════════════
+// NOTIFICATION SYSTEM
+// ════════════════════════════════════════════════════════
+
+// Track what we already notified so we don't repeat
+const notifiedSet = new Set(JSON.parse(localStorage.getItem('jarvis_notified') || '[]'));
+function markNotified(key) {
+  notifiedSet.add(key);
+  // keep max 200 keys to avoid bloat
+  const arr = [...notifiedSet].slice(-200);
+  localStorage.setItem('jarvis_notified', JSON.stringify(arr));
+}
+
+// Update bell icon based on permission state
+function updateBellIcon() {
+  const btn = document.getElementById('notif-bell');
+  if (!btn) return;
+  if (!('Notification' in window)) { btn.style.display='none'; return; }
+  if (Notification.permission === 'granted') {
+    btn.textContent = '🔔'; btn.className = 'notif-bell enabled';
+    btn.title = 'Powiadomienia włączone';
+  } else if (Notification.permission === 'denied') {
+    btn.textContent = '🔕'; btn.className = 'notif-bell denied';
+    btn.title = 'Powiadomienia zablokowane — odblokuj w ustawieniach';
+  } else {
+    btn.textContent = '🔔'; btn.className = 'notif-bell';
+    btn.title = 'Kliknij aby włączyć powiadomienia';
+  }
+}
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    alert('Twoja przeglądarka nie obsługuje powiadomień.\nNa iOS wymagana jest instalacja jako PWA (Dodaj do ekranu głównego).');
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    alert('Powiadomienia są zablokowane.\nWejdź w Ustawienia → Safari → Powiadomienia i odblokuj tę witrynę.');
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  updateBellIcon();
+  if (perm === 'granted') {
+    sendNotification('🔔 JARVIS', 'Powiadomienia włączone! Będziesz dostawać alerty o wydarzeniach i zadaniach.', 'welcome');
+  }
+}
+
+// Core function: send via SW if available, fallback to direct Notification
+async function sendNotification(title, body, tag) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    if ('serviceWorker' in navigator) {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification(title, {
+        body,
+        icon: 'icon-192.png',
+        badge: 'icon-192.png',
+        tag: tag || 'jarvis-' + Date.now(),
+        renotify: true,
+        vibrate: [200, 100, 200],
+      });
+    } else {
+      new Notification(title, { body, icon: 'icon-192.png', tag });
+    }
+  } catch(e) {
+    // fallback for browsers where SW showNotification fails
+    try { new Notification(title, { body, tag }); } catch(_) {}
+  }
+}
+
+// ── Calendar reminders: 1h before and at event time ──
+function checkCalendarReminders() {
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+
+  events.forEach(ev => {
+    if (!ev.time) return;
+    const [hh, mm] = ev.time.split(':').map(Number);
+    const evMins = hh * 60 + mm;
+
+    // 1 hour before (fire in window 58–62 min before)
+    const diff1h = evMins - nowMins;
+    if (ev.date === todayStr && diff1h >= 58 && diff1h <= 62) {
+      const key = `ev-1h-${ev.id}-${todayStr}`;
+      if (!notifiedSet.has(key)) {
+        markNotified(key);
+        sendNotification(
+          '⏰ Za godzinę: ' + ev.title,
+          `Dzisiaj o ${ev.time}${ev.timeEnd ? '–' + ev.timeEnd : ''}${ev.description ? '\n' + ev.description : ''}`,
+          key
+        );
+      }
+    }
+
+    // 10 minutes before
+    const diff10 = evMins - nowMins;
+    if (ev.date === todayStr && diff10 >= 8 && diff10 <= 12) {
+      const key = `ev-10m-${ev.id}-${todayStr}`;
+      if (!notifiedSet.has(key)) {
+        markNotified(key);
+        sendNotification(
+          '🚨 Za 10 min: ' + ev.title,
+          `Dzisiaj o ${ev.time}${ev.timeEnd ? '–' + ev.timeEnd : ''}`,
+          key
+        );
+      }
+    }
+
+    // At event time (±2 min)
+    const diffAt = evMins - nowMins;
+    if (ev.date === todayStr && diffAt >= -2 && diffAt <= 2) {
+      const key = `ev-now-${ev.id}-${todayStr}`;
+      if (!notifiedSet.has(key)) {
+        markNotified(key);
+        sendNotification(
+          '📅 Teraz: ' + ev.title,
+          `Wydarzenie rozpoczyna się o ${ev.time}`,
+          key
+        );
+      }
+    }
+  });
+}
+
+// ── Task reminders: every hour if there are active tasks ──
+function checkTaskReminders() {
+  const now = new Date();
+  const mins = now.getMinutes();
+  // Fire in minutes 0–4 of each hour (to catch the top of the hour reliably)
+  if (mins > 4) return;
+
+  const activeTasks = tasks.filter(t => !t.done);
+  if (!activeTasks.length) return;
+
+  const hour = now.getHours();
+  // Only remind during working hours: 8:00–22:00
+  if (hour < 8 || hour >= 22) return;
+
+  const dateKey = now.toISOString().split('T')[0];
+  const key = `tasks-hour-${dateKey}-${hour}`;
+  if (notifiedSet.has(key)) return;
+  markNotified(key);
+
+  // Pick up to 3 high-priority tasks to show
+  const sorted = [...activeTasks].sort((a,b) => {
+    const o = {high:0,medium:1,low:2};
+    return (o[a.priority]||1) - (o[b.priority]||1);
+  });
+  const preview = sorted.slice(0,3).map(t => '• ' + t.title).join('\n');
+  const more = activeTasks.length > 3 ? `\n+${activeTasks.length - 3} więcej` : '';
+
+  sendNotification(
+    `✅ Masz ${activeTasks.length} aktywnych zadań`,
+    preview + more,
+    key
+  );
+}
+
+// ── Tomorrow's events reminder at 20:00 ──
+function checkTomorrowReminder() {
+  const now = new Date();
+  if (now.getHours() !== 20 || now.getMinutes() > 4) return;
+
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tStr = tomorrow.toISOString().split('T')[0];
+  const tomorrowEvs = events.filter(e => e.date === tStr);
+  if (!tomorrowEvs.length) return;
+
+  const dateKey = now.toISOString().split('T')[0];
+  const key = `tomorrow-${dateKey}`;
+  if (notifiedSet.has(key)) return;
+  markNotified(key);
+
+  const list = tomorrowEvs.slice(0,3).map(e => `• ${e.time||'?:??'} ${e.title}`).join('\n');
+  sendNotification(
+    `📅 Jutro masz ${tomorrowEvs.length} wydarzeń`,
+    list,
+    key
+  );
+}
+
+// ── Master tick: runs every minute ──
+function notifTick() {
+  if (Notification.permission !== 'granted') return;
+  checkCalendarReminders();
+  checkTaskReminders();
+  checkTomorrowReminder();
+}
+
+// Start ticker when app loads
+function initNotifications() {
+  updateBellIcon();
+  // Check immediately, then every 60s
+  notifTick();
+  setInterval(notifTick, 60_000);
 }
 </script>
 <script>
