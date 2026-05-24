@@ -470,7 +470,9 @@ nav {
   position: relative; overflow: hidden;
 }
 .cal-cell:nth-child(7n) { border-right: none; }
-.cal-cell:hover { background: rgba(0,229,255,.05); }
+.cal-cell:hover { background: rgba(0,229,255,.07); }
+.cal-cell:active { background: rgba(0,229,255,.14); }
+.cal-cell:hover .cal-day-num { color: var(--c); }
 .cal-cell.other-month .cal-day-num { opacity: .22; }
 .cal-cell.today .cal-day-num {
   background: var(--c); color: var(--bg);
@@ -537,6 +539,19 @@ nav {
 .cal-hour-slot {
   height: 48px; border-bottom: 1px solid rgba(0,229,255,.04);
 }
+.week-allday-row { display:flex; flex-direction:column; gap:2px; margin-top:3px; }
+.cal-week-allday-chip {
+  font-size: 8px; padding: 2px 4px; border-radius: 2px;
+  background: rgba(0,229,255,.15); border-left: 2px solid var(--c);
+  color: var(--c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer; transition: background .15s;
+}
+.cal-week-allday-chip:hover { background: rgba(0,229,255,.28); }
+.cal-week-col-hdr { overflow: visible; }
+.cal-week-allday-chip.cat-praca     { border-left-color: var(--cat-praca);     background: rgba(255,77,109,.12);  color: var(--cat-praca); }
+.cal-week-allday-chip.cat-wyjscia   { border-left-color: var(--cat-wyjscia);   background: rgba(0,255,179,.1);    color: var(--cat-wyjscia); }
+.cal-week-allday-chip.cat-obowiazki { border-left-color: var(--cat-obowiazki); background: rgba(255,110,180,.1);  color: var(--cat-obowiazki); }
+
 .cal-week-event {
   position: absolute; left: 2px; right: 2px;
   background: rgba(0,229,255,.18); border-left: 2px solid var(--c);
@@ -545,7 +560,30 @@ nav {
   cursor: pointer; transition: background .15s;
   font-family: var(--font-body);
 }
-.cal-week-event:hover { background: rgba(0,229,255,.28); }
+.cal-week-event:hover { background: rgba(0,229,255,.32); box-shadow: 0 0 0 1px rgba(0,229,255,.5); }
+.cal-week-event::after { content: '✎'; position:absolute; top:2px; right:3px; font-size:8px; opacity:0; transition:opacity .15s; }
+.cal-week-event:hover::after { opacity:.7; }
+
+/* All-day banner */
+.cal-allday-bar {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  padding: 7px 10px 7px 50px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,229,255,.03);
+  flex-shrink: 0;
+}
+.cal-allday-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 4px;
+  background: rgba(0,229,255,.13); border: 1px solid rgba(0,229,255,.3);
+  color: var(--c); font-size: 11px; font-family: var(--font-body);
+  cursor: pointer; transition: background .15s; white-space: nowrap;
+}
+.cal-allday-chip:hover { background: rgba(0,229,255,.24); }
+.cal-allday-chip .allday-label {
+  font-family: var(--font-mono); font-size: 7px; letter-spacing: .15em;
+  color: var(--text3); margin-right: 2px;
+}
 
 /* Day view */
 .cal-day-view { display: flex; flex-direction: column; }
@@ -569,7 +607,9 @@ nav {
   font-size: 11px; color: var(--c);
   cursor: pointer; transition: background .15s;
 }
-.cal-day-event:hover { background: rgba(0,229,255,.28); }
+.cal-day-event:hover { background: rgba(0,229,255,.3); box-shadow: 0 0 0 1px rgba(0,229,255,.5); }
+.cal-day-event::after { content: '✎'; position:absolute; top:4px; right:6px; font-size:9px; opacity:0; transition:opacity .15s; }
+.cal-day-event:hover::after { opacity:.7; }
 .cal-now-line {
   position: absolute; left: 0; right: 0; height: 1px;
   background: var(--r); z-index: 2;
@@ -1476,9 +1516,9 @@ nav { padding-bottom: max(var(--sab), 8px); }
 .task-card-due.overdue { color:var(--r); }
 
 /* Modal */
-.task-modal-overlay { position:fixed; inset:0; z-index:9500; background:rgba(0,0,0,.6); backdrop-filter:blur(10px); display:none; align-items:flex-end; justify-content:center; }
-.task-modal-overlay.open { display:flex; animation:slideUp .3s cubic-bezier(.32,1,.23,1); }
-.task-modal { width:100%; max-width:560px; background:rgba(7,14,20,.99); border:1px solid rgba(0,229,255,.25); border-top:1px solid rgba(0,229,255,.4); border-radius:24px 24px 0 0; overflow:hidden; padding-bottom:max(env(safe-area-inset-bottom,20px),20px); max-height:92dvh; overflow-y:auto; }
+.task-modal-overlay { position:fixed; inset:0; z-index:9500; background:rgba(0,0,0,.6); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; padding:16px; }
+.task-modal-overlay.open { display:flex; animation:fadeIn .2s ease; }
+.task-modal { width:100%; max-width:560px; background:rgba(7,14,20,.99); border:1px solid rgba(0,229,255,.25); border-top:1px solid rgba(0,229,255,.4); border-radius:20px; overflow:hidden; padding-bottom:max(env(safe-area-inset-bottom,20px),20px); max-height:92dvh; overflow-y:auto; }
 .task-modal-hdr { display:flex; align-items:center; justify-content:space-between; padding:18px 20px 14px; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(7,14,20,.99); z-index:2; }
 .task-modal-hdr::before { content:''; position:absolute; top:8px; left:50%; transform:translateX(-50%); width:36px; height:4px; border-radius:2px; background:rgba(0,229,255,.2); }
 .task-modal-title { font-family:var(--font-mono); font-size:11px; letter-spacing:.25em; color:var(--c); }
@@ -1580,6 +1620,13 @@ nav { padding-bottom: max(var(--sab), 8px); }
   font-weight: 700; cursor: pointer; transition: all .15s;
 }
 .ef-btn-save:hover { background: rgba(0,229,255,.22); box-shadow: 0 0 20px rgba(0,229,255,.18); }
+.ef-btn-delete {
+  padding: 10px 14px; background: transparent;
+  border: 1px solid rgba(255,77,109,.25); border-radius: 5px; color: rgba(255,77,109,.5);
+  font-family: var(--font-mono); font-size: 12px; cursor: pointer; transition: all .15s;
+  flex-shrink: 0;
+}
+.ef-btn-delete:hover { background: rgba(255,77,109,.1); border-color: rgba(255,77,109,.6); color: var(--r); }
 
 /* ── Event Categories ── */
 :root {
@@ -1768,7 +1815,7 @@ nav { padding-bottom: max(var(--sab), 8px); }
         <button class="cal-nav-btn" onclick="calShift(1)">›</button>
       </div>
       <div class="cal-toolbar-right">
-        <button class="cal-add-btn" onclick="openAddEventModal()" title="Dodaj wydarzenie">＋</button>
+        <button class="cal-add-btn" onclick="openAddEventModal(calView==='day'||calView==='week'?toDateStr(calDate):null)" title="Dodaj wydarzenie">＋</button>
         <div class="cal-view-seg">
           <button class="cal-seg-btn active" id="seg-month" onclick="setCalView('month',this)">MIE</button>
           <button class="cal-seg-btn" id="seg-week"  onclick="setCalView('week',this)">TYG</button>
@@ -2139,6 +2186,7 @@ async function sendMsg(){
   const text=inp.value.trim();
   if(!text)return;
   inp.value='';
+  delete inp.dataset.baseText;
   setLoading(true);
   addUserMsg(text);
   showTyping();
@@ -2409,7 +2457,7 @@ function calCell(dayNum,dateStr,otherMonth,isToday,evs){
     inner+=`<div class="cal-event-dot${e.category?' cat-'+e.category:''}" title="${esc(e.title)}"><span class="cat-dot cat-dot-${e.category||''}" style="${e.category?'':'display:none'}"></span>${esc(e.time?e.time+' ':'')}${esc(e.title)}</div>`;
   });
   if(evs.length>2) inner+=`<div class="cal-event-dot more">+${evs.length-2} więcej</div>`;
-  return `<div class="${cls.join(' ')}" onclick="openDrawer('${dateStr}')">${inner}</div>`;
+  return `<div class="${cls.join(' ')}" onclick="goToDay('${dateStr}')">${inner}</div>`;
 }
 
 // ── WEEK ──
@@ -2428,9 +2476,12 @@ function renderWeek(){
   days.forEach(d=>{
     const ds=toDateStr(d);
     const isTod=ds===todayStr;
-    html+=`<div class="cal-week-col-hdr${isTod?' today-col':''}">
+    const wkAllDay = eventsForDate(ds).filter(e=>!e.time);
+    const wkChips = wkAllDay.map(e=>`<div class="cal-week-allday-chip${e.category?' cat-'+e.category:''}" onclick="event.stopPropagation();openEditModal(${e.id})" title="${esc(e.title)}">${esc(e.title)}</div>`).join('');
+    html+=`<div class="cal-week-col-hdr${isTod?' today-col':''}" onclick="goToDay('${ds}')" style="cursor:pointer" title="Przejdź do dnia">
       <div class="wday">${DAYS_PL[(d.getDay()+6)%7]}</div>
       <div class="wnum${isTod?' today-num':''}">${d.getDate()}</div>
+      ${wkChips?`<div class="week-allday-row">${wkChips}</div>`:''}
     </div>`;
   });
   html+='</div>';
@@ -2455,7 +2506,7 @@ function renderWeek(){
         height=Math.max(24,((eh+(em||0)/60)-(hh+(mm||0)/60))*48);
       }
       const timeLabel=ev.timeEnd?`${ev.time}–${ev.timeEnd}`:ev.time;
-      html+=`<div class="cal-week-event${ev.category?' cat-'+ev.category:''}" style="top:${top}px;height:${height}px" onclick="openDrawer('${ds}')" title="${esc(ev.title)}">${esc(timeLabel)} ${esc(ev.title)}</div>`;
+      html+=`<div class="cal-week-event${ev.category?' cat-'+ev.category:''}" style="top:${top}px;height:${height}px" onclick="event.stopPropagation();openEditModal(${ev.id})" title="${esc(ev.title)}">${esc(timeLabel)} ${esc(ev.title)}</div>`;
     });
     html+='</div>';
   });
@@ -2483,9 +2534,14 @@ function renderDay(){
   const nowMinutes=calDate.getDate()===today.getDate()&&calDate.getMonth()===today.getMonth()&&calDate.getFullYear()===today.getFullYear()
     ?(today.getHours()*60+today.getMinutes()):-1;
 
+  const allDay=dayEvs.filter(ev=>!ev.time);
+  const alldayBar = allDay.length
+    ? `<div class="cal-allday-bar">${allDay.map(ev=>`<div class="cal-allday-chip" onclick="openEditModal(${ev.id})"><span class="allday-label">CAŁY DZIEŃ</span>${esc(ev.title)}</div>`).join('')}</div>`
+    : '';
+
   let html=`<div class="cal-day-view"><div class="cal-day-hdr">${ds===todayStr?'DZIŚ · ':''}`+
     calDate.toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})+
-    `</div><div class="cal-day-body">`;
+    `</div>${alldayBar}<div class="cal-day-body">`;
 
   html+='<div class="cal-time-col">';
   for(let h=0;h<24;h++) html+=`<div class="cal-hour-label">${String(h).padStart(2,'0')}</div>`;
@@ -2503,22 +2559,12 @@ function renderDay(){
       height=Math.max(32,((eh+(em||0)/60)-(hh+(mm||0)/60))*48);
     }
     const timeLabel=ev.timeEnd?`${ev.time}–${ev.timeEnd}`:ev.time;
-    html+=`<div class="cal-day-event${ev.category?' cat-'+ev.category:''}" style="top:${top}px;min-height:${height}px" onclick="openDrawer('${ds}')">${esc(timeLabel)} <strong>${esc(ev.title)}</strong>${ev.description?'<br><span style=\'font-size:10px;opacity:.7\'>'+esc(ev.description)+'</span>':''}</div>`;
+    html+=`<div class="cal-day-event${ev.category?' cat-'+ev.category:''}" style="top:${top}px;min-height:${height}px" onclick="openEditModal(${ev.id})">${esc(timeLabel)} <strong>${esc(ev.title)}</strong>${ev.description?'<br><span style=\'font-size:10px;opacity:.7\'>'+esc(ev.description)+'</span>':''}</div>`;
   });
   if(nowMinutes>=0){
     html+=`<div class="cal-now-line" style="top:${nowMinutes/60*48}px"></div>`;
   }
   html+='</div></div></div>';
-
-  // all-day events (no time)
-  const allDay=dayEvs.filter(ev=>!ev.time);
-  if(allDay.length){
-    html=html.replace('</div></div></div>','');
-    allDay.forEach(ev=>{
-      html+=`<div style="padding:8px 16px;border-bottom:1px solid var(--border)"><span style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">CAŁY DZIEŃ</span> <span style="color:var(--text);font-size:13px">${esc(ev.title)}</span></div>`;
-    });
-    html+='</div></div></div>';
-  }
 
   document.getElementById('cal-body').innerHTML=html;
   setTimeout(()=>{
@@ -2564,6 +2610,12 @@ function closeDrawer(){
   document.getElementById('cal-drawer').classList.remove('open');
 }
 
+function goToDay(dateStr){
+  calDate = new Date(dateStr + 'T12:00:00');
+  setCalView('day', document.getElementById('seg-day'));
+  closeDrawer();
+}
+
 // ── Add event modal ──
 function openAddEventModal(dateStr){
   const modal = document.getElementById('cal-modal-overlay');
@@ -2598,8 +2650,7 @@ async function saveEventFromModal(){
   events.push({id, title, date, time: timeStart, timeEnd, description: desc, category, createdAt: new Date().toISOString()});
   renderCalendar();
   closeAddEventModal();
-  // open drawer for that day
-  openDrawer(date);
+  goToDay(date);
 }
 // ── Tasks state ──────────────────────────────────────────────────
 let taskFilter = 'active';
@@ -3081,6 +3132,14 @@ function closeEditModal(){
   editingEventId = null;
 }
 
+async function deleteFromEditModal(){
+  if(!editingEventId) return;
+  if(!confirm('Usunąć to wydarzenie?')) return;
+  await deleteItem('events', editingEventId);
+  closeEditModal();
+  renderCalView();
+}
+
 async function saveEditModal(){
   if(!editingEventId) return;
   const ev = events.find(e=>e.id===editingEventId);
@@ -3171,6 +3230,7 @@ document.addEventListener('touchend',e=>{
         </div>
       </div>
       <div class="edit-modal-footer">
+        <button class="ef-btn-delete" onclick="deleteFromEditModal()" title="Usuń wydarzenie">🗑</button>
         <button class="ef-btn-cancel" onclick="closeEditModal()">ANULUJ</button>
         <button class="ef-btn-save" id="ef-save-btn" onclick="saveEditModal()">ZAPISZ ✓</button>
       </div>
