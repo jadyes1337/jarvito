@@ -1540,6 +1540,450 @@ nav {
   }
 }
 
+
+/* ═══════════════════════════════════════════════
+   TASKS — New Layout
+   ═══════════════════════════════════════════════ */
+
+/* ── Top bar: filters + FAB + progress ── */
+.tasks-topbar {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: rgba(7,14,20,.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.tasks-filters-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px;
+  gap: 10px;
+}
+
+.tasks-filters {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.task-filter-btn {
+  flex: 1;
+  padding: 8px 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  cursor: pointer;
+  transition: all .18s;
+  text-align: center;
+}
+.task-filter-btn:active { opacity: .7; }
+.task-filter-btn.active {
+  background: rgba(0,229,255,.13);
+  border-color: rgba(0,229,255,.45);
+  color: var(--c);
+}
+
+/* FAB — floating add button */
+.tasks-fab {
+  width: 42px; height: 42px;
+  min-width: 44px; min-height: 44px;
+  border-radius: 50%;
+  background: var(--c);
+  border: none;
+  color: var(--bg);
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 24px rgba(0,229,255,.45), 0 4px 16px rgba(0,0,0,.4);
+  transition: all .2s;
+}
+.tasks-fab:active {
+  transform: scale(.9);
+  box-shadow: 0 0 14px rgba(0,229,255,.3);
+}
+
+/* Progress bar inside topbar */
+.tasks-progress-bar-wrap {
+  height: 3px;
+  background: rgba(0,229,255,.07);
+  margin: 0;
+}
+.tasks-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--g), var(--c));
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+  border-radius: 0 2px 2px 0;
+}
+.tasks-progress-stats {
+  padding: 6px 12px 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tasks-progress-label { display: none; }
+
+/* ── Priority filter pills in stats bar ── */
+.prio-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  font-weight: 700;
+  background: transparent;
+  color: var(--text3);
+  transition: all .18s;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 32px;
+  min-width: 44px;
+}
+.prio-filter-pill:active { transform: scale(.92); }
+
+.prio-filter-pill .pill-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: transform .18s;
+}
+.prio-filter-pill.active .pill-dot { transform: scale(1.25); }
+
+/* Red / high */
+.prio-filter-pill.pill-high .pill-dot { background: var(--r); box-shadow: 0 0 6px rgba(255,77,109,.5); }
+.prio-filter-pill.pill-high.active {
+  background: rgba(255,77,109,.12);
+  border-color: rgba(255,77,109,.45);
+  color: var(--r);
+  box-shadow: 0 0 12px rgba(255,77,109,.15);
+}
+/* Yellow / medium */
+.prio-filter-pill.pill-medium .pill-dot { background: var(--y); box-shadow: 0 0 6px rgba(255,209,102,.5); }
+.prio-filter-pill.pill-medium.active {
+  background: rgba(255,209,102,.1);
+  border-color: rgba(255,209,102,.45);
+  color: var(--y);
+  box-shadow: 0 0 12px rgba(255,209,102,.12);
+}
+/* Green / low */
+.prio-filter-pill.pill-low .pill-dot { background: var(--g); box-shadow: 0 0 6px rgba(0,255,179,.5); }
+.prio-filter-pill.pill-low.active {
+  background: rgba(0,255,179,.08);
+  border-color: rgba(0,255,179,.4);
+  color: var(--g);
+  box-shadow: 0 0 12px rgba(0,255,179,.1);
+}
+/* All / reset pill */
+.prio-filter-pill.pill-all .pill-dot {
+  background: conic-gradient(var(--r) 0deg 120deg, var(--y) 120deg 240deg, var(--g) 240deg 360deg);
+  box-shadow: 0 0 6px rgba(0,229,255,.3);
+}
+.prio-filter-pill.pill-all.active {
+  background: rgba(0,229,255,.08);
+  border-color: rgba(0,229,255,.35);
+  color: var(--c);
+}
+
+/* ── Task cards — redesigned ── */
+.task-card {
+  background: rgba(11,21,32,.75);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  margin-bottom: 10px;
+  position: relative;
+  transition: all .2s;
+  animation: msgIn .22s ease;
+  overflow: hidden;
+}
+.task-card::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; border-radius: 3px 0 0 3px;
+  background: var(--text3);
+  transition: background .2s;
+}
+.task-card.prio-high::before   { background: var(--r); }
+.task-card.prio-medium::before { background: var(--y); }
+.task-card.prio-low::before    { background: var(--g); }
+.task-card.done-card {
+  opacity: .48;
+  background: rgba(11,21,32,.4);
+}
+.task-card.done-card::before { background: var(--text3) !important; }
+.task-card.done-card .task-card-title { text-decoration: line-through; }
+
+.task-card-row { display: flex; align-items: flex-start; gap: 12px; }
+
+/* Custom circular checkbox */
+.task-toggle {
+  width: 24px; height: 24px;
+  border-radius: 50%; flex-shrink: 0; cursor: pointer;
+  border: 2px solid rgba(0,229,255,.35);
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s; margin-top: 1px;
+  padding: 0; box-sizing: border-box;
+  /* large tap zone */
+  min-width: 44px; min-height: 44px;
+  margin: -10px; padding: 10px;
+  box-sizing: content-box;
+}
+.task-toggle::after {
+  content: ''; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--c); opacity: 0; transform: scale(0);
+  transition: all .2s;
+}
+.task-toggle.checked { border-color: var(--g); background: rgba(0,255,179,.1); }
+.task-toggle.checked::after { background: var(--g); opacity: 1; transform: scale(1); }
+
+.task-card-title {
+  font-size: 15px; font-weight: 500; color: var(--text);
+  flex: 1; line-height: 1.4; padding-top: 2px;
+}
+
+/* Meta row: difficulty chip + date + time */
+.task-card-meta-row {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: 6px; margin-top: 8px; padding-left: 44px;
+}
+.task-diff-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px; border-radius: 20px;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .12em;
+  font-weight: 700;
+}
+.diff-low    { color: var(--g); background: rgba(0,255,179,.1);  border: 1px solid rgba(0,255,179,.25);  }
+.diff-medium { color: var(--y); background: rgba(255,209,102,.1); border: 1px solid rgba(255,209,102,.3); }
+.diff-high   { color: var(--r); background: rgba(255,77,109,.1);  border: 1px solid rgba(255,77,109,.3);  }
+
+.task-card-due {
+  font-family: var(--font-mono); font-size: 9px;
+  color: var(--text3); letter-spacing: .08em;
+  display: flex; align-items: center; gap: 3px;
+}
+.task-card-due.overdue { color: var(--r); }
+.task-card-note {
+  font-size: 12px; color: var(--text2); margin-top: 6px;
+  padding-left: 44px; line-height: 1.5; opacity: .75;
+}
+.task-card-del {
+  position: absolute; top: 10px; right: 10px;
+  background: transparent; border: none;
+  color: rgba(255,77,109,.22); cursor: pointer;
+  font-size: 14px; padding: 4px 8px;
+  border-radius: 6px; transition: all .15s;
+  min-width: 36px; min-height: 36px;
+  display: flex; align-items: center; justify-content: center;
+}
+.task-card-del:active { color: var(--r); background: rgba(255,77,109,.1); }
+
+/* Section labels */
+.tasks-section-label {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .3em;
+  color: var(--text3); padding: 12px 2px 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.tasks-section-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ── Task Add/Edit Modal ── */
+.task-modal-overlay {
+  position: fixed; inset: 0; z-index: 9500;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: none; align-items: flex-end; justify-content: center;
+}
+.task-modal-overlay.open {
+  display: flex;
+  animation: slideUp .3s cubic-bezier(.32,1,.23,1);
+}
+
+.task-modal {
+  width: 100%; max-width: 560px;
+  background: rgba(7,14,20,.99);
+  border: 1px solid rgba(0,229,255,.25);
+  border-top: 1px solid rgba(0,229,255,.4);
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+  padding-bottom: max(env(safe-area-inset-bottom,20px), 20px);
+  max-height: 92dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.task-modal-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+  background: rgba(7,14,20,.99);
+  backdrop-filter: blur(12px);
+  z-index: 2;
+}
+/* drag handle */
+.task-modal-hdr::before {
+  content: '';
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 36px; height: 4px; border-radius: 2px;
+  background: rgba(0,229,255,.2);
+}
+.task-modal-title {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .25em; color: var(--c);
+}
+.task-modal-close {
+  background: transparent; border: none;
+  color: var(--text3); font-size: 18px; cursor: pointer;
+  min-width: 44px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; transition: all .15s;
+}
+.task-modal-close:active { background: rgba(255,77,109,.1); color: var(--r); }
+
+.task-modal-body {
+  padding: 16px 20px 10px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.tm-field { display: flex; flex-direction: column; gap: 6px; }
+.tm-field-half { flex: 1; }
+.tm-row { display: flex; gap: 12px; }
+
+.tm-label {
+  font-family: var(--font-mono); font-size: 8px;
+  letter-spacing: .22em; color: var(--text3);
+  padding-left: 2px;
+}
+
+.tm-input {
+  background: rgba(0,229,255,.05);
+  border: 1px solid rgba(0,229,255,.18);
+  border-radius: 12px;
+  padding: 13px 15px;
+  color: var(--text);
+  font-family: var(--font-body); font-size: 16px;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  -webkit-appearance: none; color-scheme: dark;
+  width: 100%;
+}
+.tm-input:focus {
+  border-color: rgba(0,229,255,.5);
+  box-shadow: 0 0 16px rgba(0,229,255,.08);
+}
+.tm-input::placeholder { color: var(--text3); }
+.tm-textarea { resize: none; height: 72px; font-size: 15px; }
+
+/* Difficulty selector */
+.tm-difficulty {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;
+}
+.tm-diff-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 8px;
+  background: rgba(0,229,255,.04);
+  border: 1.5px solid var(--border);
+  border-radius: 12px; cursor: pointer;
+  transition: all .18s; font-family: var(--font-body);
+  min-height: 70px;
+}
+.tm-diff-btn:active { transform: scale(.96); }
+.tm-diff-icon { font-size: 22px; line-height: 1; }
+.tm-diff-name {
+  font-family: var(--font-mono); font-size: 8px;
+  letter-spacing: .18em; color: var(--text3);
+  transition: color .18s;
+}
+.tm-diff-btn[data-p="low"].active {
+  background: rgba(0,255,179,.1); border-color: rgba(0,255,179,.5);
+}
+.tm-diff-btn[data-p="low"].active .tm-diff-name { color: var(--g); }
+.tm-diff-btn[data-p="medium"].active {
+  background: rgba(255,209,102,.1); border-color: rgba(255,209,102,.5);
+}
+.tm-diff-btn[data-p="medium"].active .tm-diff-name { color: var(--y); }
+.tm-diff-btn[data-p="high"].active {
+  background: rgba(255,77,109,.1); border-color: rgba(255,77,109,.5);
+}
+.tm-diff-btn[data-p="high"].active .tm-diff-name { color: var(--r); }
+
+.tm-err {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--r); text-align: center; min-height: 16px;
+  letter-spacing: .1em;
+}
+
+.tm-save-btn {
+  width: 100%; padding: 16px;
+  background: rgba(0,229,255,.14);
+  border: 1px solid rgba(0,229,255,.45);
+  border-radius: 14px; color: var(--c);
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .22em; cursor: pointer;
+  transition: all .2s; margin-top: 4px;
+  font-weight: 700;
+}
+.tm-save-btn:active { background: rgba(0,229,255,.28); transform: scale(.99); }
+
+
+/* ── Difficulty chip — clickable/cyclable on card ── */
+.diff-btn-cycle {
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: .12em;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all .18s;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;
+}
+.diff-btn-cycle::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background .15s;
+}
+.diff-btn-cycle:active::after {
+  background: rgba(255,255,255,.12);
+}
+.diff-btn-cycle:active {
+  transform: scale(.94);
+}
+/* tooltip hint on first render */
+.diff-btn-cycle .edit-hint {
+  font-size: 7px;
+  opacity: .55;
+  margin-left: 1px;
+}
+
 </style>
 </head>
 <body>
@@ -1720,43 +2164,83 @@ nav {
 
   <!-- TASKS -->
   <div class="panel" id="panel-tasks">
-    <!-- Add task form -->
-    <div class="tasks-add-form" id="tasks-add-form">
-      <div class="tasks-add-row">
-        <input class="tasks-add-input" id="task-add-input" type="text"
-          placeholder="Nowe zadanie..."
-          onkeydown="if(event.key==='Enter')addTaskManual()">
-        <button class="tasks-add-btn" id="task-opts-btn" onclick="toggleTaskOpts()">＋</button>
+
+    <!-- Toolbar: filters + progress + add button -->
+    <div class="tasks-topbar">
+      <div class="tasks-filters-row">
+        <div class="tasks-filters">
+          <button class="task-filter-btn active" onclick="setTaskFilter('all',this)">WSZYSTKIE</button>
+          <button class="task-filter-btn" onclick="setTaskFilter('active',this)">AKTYWNE</button>
+          <button class="task-filter-btn" onclick="setTaskFilter('done',this)">UKOŃCZONE</button>
+        </div>
+        <button class="tasks-fab" onclick="openTaskModal()" title="Nowe zadanie">＋</button>
       </div>
-      <div class="task-opts-panel" id="task-opts-panel">
-        <div class="task-opts-row">
-          <span class="task-opts-label">PRIORYTET</span>
-          <div class="task-prio-select" id="task-prio-select">
-            <button class="tps-btn" data-p="low"    onclick="selectNewPrio('low',this)">↓ NISKI</button>
-            <button class="tps-btn active" data-p="medium" onclick="selectNewPrio('medium',this)">→ ŚREDNI</button>
-            <button class="tps-btn" data-p="high"   onclick="selectNewPrio('high',this)">↑ WYSOKI</button>
+      <div class="tasks-progress-bar-wrap" id="tasks-progress-wrap">
+        <div class="tasks-progress-bar" id="tasks-progress-bar"></div>
+      </div>
+      <div class="tasks-progress-stats" id="tasks-progress-stats"></div>
+    </div>
+
+    <div class="data-scroll" id="tasks-scroll" style="padding:14px 16px 20px">
+      <div id="tasks-list"></div>
+    </div>
+  </div>
+
+  <!-- TASK ADD/EDIT MODAL -->
+  <div class="task-modal-overlay" id="task-modal-overlay" onclick="closeTaskModal()">
+    <div class="task-modal" onclick="event.stopPropagation()">
+      <div class="task-modal-hdr">
+        <span class="task-modal-title" id="task-modal-title">NOWE ZADANIE</span>
+        <button class="task-modal-close" onclick="closeTaskModal()">✕</button>
+      </div>
+      <div class="task-modal-body">
+
+        <!-- Title -->
+        <div class="tm-field">
+          <label class="tm-label">TYTUŁ</label>
+          <input class="tm-input" id="tm-title" type="text" placeholder="Co trzeba zrobić...">
+        </div>
+
+        <!-- Difficulty / Priority -->
+        <div class="tm-field">
+          <label class="tm-label">TRUDNOŚĆ</label>
+          <div class="tm-difficulty">
+            <button class="tm-diff-btn" data-p="low" onclick="selectTmPrio('low',this)">
+              <span class="tm-diff-icon">🟢</span>
+              <span class="tm-diff-name">ŁATWE</span>
+            </button>
+            <button class="tm-diff-btn active" data-p="medium" onclick="selectTmPrio('medium',this)">
+              <span class="tm-diff-icon">🟡</span>
+              <span class="tm-diff-name">ŚREDNIE</span>
+            </button>
+            <button class="tm-diff-btn" data-p="high" onclick="selectTmPrio('high',this)">
+              <span class="tm-diff-icon">🔴</span>
+              <span class="tm-diff-name">TRUDNE</span>
+            </button>
           </div>
         </div>
-        <div class="task-opts-row">
-          <span class="task-opts-label">TERMIN</span>
-          <input class="tasks-add-date" id="task-add-date" type="date" title="Termin (opcjonalnie)">
-        </div>
-      </div>
-    </div>
-    <div class="tasks-toolbar">
-      <div class="tasks-filters">
-        <button class="task-filter-btn active" onclick="setTaskFilter('all',this)">WSZYSTKIE</button>
-        <button class="task-filter-btn" onclick="setTaskFilter('active',this)">AKTYWNE</button>
-        <button class="task-filter-btn" onclick="setTaskFilter('done',this)">UKOŃCZONE</button>
-      </div>
 
-    </div>
-    <div class="tasks-progress-bar-wrap" id="tasks-progress-wrap">
-      <div class="tasks-progress-bar" id="tasks-progress-bar"></div>
-      <span class="tasks-progress-label" id="tasks-progress-label"></span>
-    </div>
-    <div class="data-scroll" id="tasks-scroll" style="padding:16px 18px 16px">
-      <div id="tasks-list"></div>
+        <!-- Date + Time row -->
+        <div class="tm-row">
+          <div class="tm-field tm-field-half">
+            <label class="tm-label">DATA TERMINU</label>
+            <input class="tm-input" id="tm-date" type="date">
+          </div>
+          <div class="tm-field tm-field-half">
+            <label class="tm-label">GODZINA</label>
+            <input class="tm-input" id="tm-time" type="time">
+          </div>
+        </div>
+
+        <!-- Note (optional) -->
+        <div class="tm-field">
+          <label class="tm-label">NOTATKA <span style="opacity:.4;font-size:8px">(OPCJONALNIE)</span></label>
+          <textarea class="tm-input tm-textarea" id="tm-note" placeholder="Dodatkowe informacje..."></textarea>
+        </div>
+
+        <div class="tm-err" id="tm-err"></div>
+        <button class="tm-save-btn" onclick="saveTaskModal()">DODAJ ZADANIE ▶</button>
+      </div>
     </div>
   </div>
 
@@ -2443,129 +2927,179 @@ async function saveEventFromModal(){
   // open drawer for that day
   openDrawer(date);
 }
-// ── Tasks filter state ──
+// ── Tasks state ──────────────────────────────────────────────────
 let taskFilter = 'all';
-let taskPrioFilter = 'all';
+let taskPrioFilter = 'all'; // 'all' | 'high' | 'medium' | 'low'
+let tmPrio = 'medium';
+
+function setPrioFilter(p, btn){
+  // toggle off if already active
+  taskPrioFilter = (taskPrioFilter === p) ? 'all' : p;
+  renderTasks();
+}
 
 function setTaskFilter(f, btn){
-  taskFilter=f;
+  taskFilter = f;
   document.querySelectorAll('.task-filter-btn').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  renderTasks();
-}
-function setTaskPrio(p, btn){
-  taskPrioFilter=p;
-  document.querySelectorAll('.task-prio-btn').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   renderTasks();
 }
 
+function setTaskPrio(p, btn){ renderTasks(); }
+
+// ── Render tasks ─────────────────────────────────────────────────
 function renderTasks(){
-  const el=document.getElementById('tasks-list');
-  document.getElementById('cnt-tasks').textContent=tasks.filter(t=>!t.done).length;
+  const el = document.getElementById('tasks-list');
+  const allActive = tasks.filter(t=>!t.done);
+  const allDone   = tasks.filter(t=>t.done);
+  document.getElementById('cnt-tasks').textContent = allActive.length;
 
-  // progress bar
+  // Progress bar + difficulty stats
+  const wrap  = document.getElementById('tasks-progress-wrap');
+  const stats = document.getElementById('tasks-progress-stats');
   if(tasks.length){
-    const done=tasks.filter(t=>t.done).length;
-    const pct=Math.round(done/tasks.length*100);
-    document.getElementById('tasks-progress-bar').style.width=pct+'%';
-    document.getElementById('tasks-progress-label').textContent=done+'/'+tasks.length+' · '+pct+'%';
-    document.getElementById('tasks-progress-wrap').style.display='';
+    const pct = Math.round(allDone.length / tasks.length * 100);
+    document.getElementById('tasks-progress-bar').style.width = pct + '%';
+    const pc = (p) => allActive.filter(t=>(t.priority||'medium')===p).length;
+    const pA = (p) => taskPrioFilter===p?' active':'';
+    stats.innerHTML =
+      `<button class="prio-filter-pill pill-all${taskPrioFilter==='all'?' active':''}" onclick="setPrioFilter('all',this)"><span class="pill-dot"></span>${tasks.length}</button>` +
+      `<button class="prio-filter-pill pill-high${pA('high')}" onclick="setPrioFilter('high',this)"><span class="pill-dot"></span>${pc('high')}</button>` +
+      `<button class="prio-filter-pill pill-medium${pA('medium')}" onclick="setPrioFilter('medium',this)"><span class="pill-dot"></span>${pc('medium')}</button>` +
+      `<button class="prio-filter-pill pill-low${pA('low')}" onclick="setPrioFilter('low',this)"><span class="pill-dot"></span>${pc('low')}</button>` +
+      `<span style="margin-left:auto;color:var(--text3);font-size:9px">${allDone.length}/${tasks.length} · ${pct}%</span>`;
+    wrap.style.display = '';
+    stats.style.display = 'flex';
   } else {
-    document.getElementById('tasks-progress-wrap').style.display='none';
+    wrap.style.display = 'none';
+    stats.style.display = 'none';
   }
 
   if(!tasks.length){
-    el.innerHTML='<div class="empty"><span class="empty-icon">✅</span>BRAK ZADAŃ<br>Dodaj zadania przez czat</div>';
+    el.innerHTML = '<div class="empty"><span class="empty-icon">✅</span>BRAK ZADAŃ<br>Dotknij ＋ aby dodać</div>';
     return;
   }
 
-  let filtered=tasks;
-  if(taskFilter==='active') filtered=filtered.filter(t=>!t.done);
-  if(taskFilter==='done') filtered=filtered.filter(t=>t.done);
-  if(taskPrioFilter!=='all') filtered=filtered.filter(t=>(t.priority||'medium')===taskPrioFilter);
+  let filtered = tasks;
+  if(taskFilter === 'active') filtered = filtered.filter(t=>!t.done);
+  if(taskFilter === 'done')   filtered = filtered.filter(t=>t.done);
+  if(taskPrioFilter !== 'all') filtered = filtered.filter(t=>(t.priority||'medium')===taskPrioFilter);
 
   if(!filtered.length){
-    el.innerHTML='<div class="empty" style="margin-top:40px">BRAK ZADAŃ W TYM FILTRZE</div>';
+    el.innerHTML = '<div class="empty" style="margin-top:40px">BRAK ZADAŃ W TYM FILTRZE</div>';
     return;
   }
 
-  const today=new Date().toISOString().split('T')[0];
-  const prioOrder={high:0,medium:1,low:2};
-  const sorted=[...filtered].sort((a,b)=>{
-    if(a.done!==b.done) return a.done?1:-1;
-    return (prioOrder[a.priority||'medium']||1)-(prioOrder[b.priority||'medium']||1);
+  const todayStr = new Date().toISOString().split('T')[0];
+  const prioOrder = {high:0, medium:1, low:2};
+  const sorted = [...filtered].sort((a,b) => {
+    if(a.done !== b.done) return a.done ? 1 : -1;
+    return (prioOrder[a.priority||'medium']||1) - (prioOrder[b.priority||'medium']||1);
   });
 
-  // sections: active then done
-  const active=sorted.filter(t=>!t.done);
-  const done=sorted.filter(t=>t.done);
+  const activeCards = sorted.filter(t=>!t.done);
+  const doneCards   = sorted.filter(t=>t.done);
 
-  let html='';
-  if(active.length){
-    if(done.length) html+=`<div class="tasks-section-label">AKTYWNE · ${active.length}</div>`;
-    html+=active.map(t=>taskCardHTML(t,today)).join('');
+  let html = '';
+  if(activeCards.length){
+    if(doneCards.length) html += `<div class="tasks-section-label">AKTYWNE · ${activeCards.length}</div>`;
+    html += activeCards.map(t => taskCardHTML(t, todayStr)).join('');
   }
-  if(done.length){
-    html+=`<div class="tasks-section-label" style="margin-top:${active.length?16:0}px">UKOŃCZONE · ${done.length}</div>`;
-    html+=done.map(t=>taskCardHTML(t,today)).join('');
+  if(doneCards.length){
+    html += `<div class="tasks-section-label" style="margin-top:${activeCards.length?18:0}px">UKONCZONE · ${doneCards.length}</div>`;
+    html += doneCards.map(t => taskCardHTML(t, todayStr)).join('');
   }
-  el.innerHTML=html;
+  el.innerHTML = html;
 }
 
-function taskCardHTML(t, today){
-  const p=t.priority||'medium';
-  const doneClass=t.done?'done-card':'';
-  const overdue=t.dueDate&&!t.done&&t.dueDate<today;
-  const dueLabel=t.dueDate?`<span class="task-card-due${overdue?' overdue':''}">📅 ${overdue?'⚠ ':''}${t.dueDate}</span>`:'';
-  const prioColors={high:'var(--r)',medium:'var(--y)',low:'var(--g)'};
-  const prioLabel=`<span style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;color:${prioColors[p]};opacity:.7">${p.toUpperCase()}</span>`;
+function taskCardHTML(t, todayStr){
+  const p = t.priority || 'medium';
+  const doneClass = t.done ? 'done-card' : '';
+  const overdue = t.dueDate && !t.done && t.dueDate < todayStr;
+
+  const diffLabels = {high:'TRUDNE', medium:'SREDNIE', low:'LATWE'};
+  const diffIcons  = {high:'\uD83D\uDD34', medium:'\uD83D\uDFE1', low:'\uD83D\uDFE2'};
+
+  // Clickable chip that cycles low→medium→high→low
+  const diffChip = `<button class="task-diff-chip diff-${p} diff-btn-cycle"
+    onclick="cycleTaskDiff(${t.id},event)"
+    title="Kliknij aby zmienić trudność"
+  >${diffIcons[p]} ${diffLabels[p]} ✎</button>`;
+
+  let dueStr = '';
+  if(t.dueDate){
+    const dl = new Date(t.dueDate + 'T12:00:00').toLocaleDateString('pl-PL',{day:'numeric',month:'short'});
+    const tl = t.dueTime ? ' \u00b7 ' + t.dueTime : '';
+    dueStr = `<span class="task-card-due${overdue?' overdue':''}">\uD83D\uDCC5 ${overdue?'\u26A0\uFE0F ':''}${dl}${tl}</span>`;
+  }
+
+  const noteHtml = t.note ? `<div class="task-card-note">${esc(t.note)}</div>` : '';
+
   return `<div class="task-card prio-${p} ${doneClass}" id="tcard-${t.id}">
-    <button class="task-card-del" onclick="deleteItem('tasks',${t.id})">✕</button>
+    <button class="task-card-del" onclick="deleteItem('tasks',${t.id})">\u2715</button>
     <div class="task-card-row">
       <div class="task-toggle${t.done?' checked':''}" onclick="toggleTask(${t.id})"></div>
       <span class="task-card-title">${esc(t.title)}</span>
     </div>
-    ${(dueLabel||!t.done)?`<div style="display:flex;align-items:center;gap:10px;margin-top:5px;padding-left:34px">${prioLabel}${dueLabel}</div>`:''}
+    <div class="task-card-meta-row">
+      ${diffChip}
+      ${dueStr}
+    </div>
+    ${noteHtml}
   </div>`;
 }
-// ── Manual task add ──
-let newTaskPrio = 'medium';
 
-function toggleTaskOpts(){
-  const inp = document.getElementById('task-add-input');
-  const title = inp.value.trim();
-  // jeśli jest tekst — dodaj zadanie
-  if(title){ addTaskManual(); return; }
-  // jeśli pusty — rozwiń/zwiń opcje
-  const panel = document.getElementById('task-opts-panel');
-  const btn = document.getElementById('task-opts-btn');
-  const open = panel.classList.toggle('open');
-  btn.classList.toggle('open', open);
-  btn.textContent = open ? '✕' : '＋';
+async function cycleTaskDiff(id, event){
+  event.stopPropagation();
+  const t = tasks.find(x=>x.id===id);
+  if(!t || t.done) return;
+  const cycle = {low:'medium', medium:'high', high:'low'};
+  t.priority = cycle[t.priority||'medium'];
+  await dbPut('tasks', t);
+  if(typeof haptic !== 'undefined') haptic('light');
+  renderTasks();
 }
 
-function selectNewPrio(p, btn){
-  newTaskPrio = p;
-  document.querySelectorAll('#task-prio-select .tps-btn').forEach(b=>b.classList.remove('active'));
+// ── Task modal ────────────────────────────────────────────────────
+function openTaskModal(){
+  tmPrio = 'medium';
+  document.getElementById('tm-title').value = '';
+  document.getElementById('tm-date').value  = '';
+  document.getElementById('tm-time').value  = '';
+  document.getElementById('tm-note').value  = '';
+  document.getElementById('tm-err').textContent = '';
+  document.getElementById('task-modal-title').textContent = 'NOWE ZADANIE';
+  document.querySelectorAll('.tm-diff-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.p === 'medium');
+  });
+  document.getElementById('task-modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('tm-title').focus(), 150);
+}
+
+function closeTaskModal(){
+  document.getElementById('task-modal-overlay').classList.remove('open');
+}
+
+function selectTmPrio(p, btn){
+  tmPrio = p;
+  document.querySelectorAll('.tm-diff-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
 }
 
-async function addTaskManual(){
-  const inp = document.getElementById('task-add-input');
-  const title = inp.value.trim();
-  if(!title) return;
-  const dueDate = document.getElementById('task-add-date').value || '';
-  const id = await dbAdd('tasks',{title, priority: newTaskPrio, dueDate, done: false});
-  tasks.push({id, title, priority: newTaskPrio, dueDate, done: false, createdAt: new Date().toISOString()});
-  inp.value = '';
-  document.getElementById('task-add-date').value = '';
-  // zamknij panel opcji po dodaniu
-  document.getElementById('task-opts-panel').classList.remove('open');
-  const btn = document.getElementById('task-opts-btn');
-  btn.classList.remove('open');
-  btn.textContent = '＋';
+async function saveTaskModal(){
+  const title = document.getElementById('tm-title').value.trim();
+  const date  = document.getElementById('tm-date').value;
+  const time  = document.getElementById('tm-time').value;
+  const note  = document.getElementById('tm-note').value.trim();
+  const errEl = document.getElementById('tm-err');
+  errEl.textContent = '';
+  if(!title){ errEl.textContent = '⚠ Wpisz tytul zadania'; return; }
+
+  const id = await dbAdd('tasks',{title, priority: tmPrio, dueDate: date, dueTime: time, note, done: false});
+  tasks.push({id, title, priority: tmPrio, dueDate: date, dueTime: time, note, done: false, createdAt: new Date().toISOString()});
+  closeTaskModal();
   renderTasks(); renderStats();
+  if(typeof haptic !== 'undefined') haptic('success');
 }
 
 async function changeTaskPrio(id, prio){
