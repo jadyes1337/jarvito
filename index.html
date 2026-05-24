@@ -2,13 +2,15 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>J.A.R.V.I.S.</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="JARVIS">
 <meta name="theme-color" content="#04080c">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,13 +40,26 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-html { height: 100%; height: -webkit-fill-available; }
+/* iOS: zapobiegaj zaznaczaniu tekstu na przyciskach */
+button { -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+
+html {
+  height: 100%;
+  /* -webkit-fill-available potrzebne dla starszych iOS */
+  height: -webkit-fill-available;
+}
 body {
-  height: 100%; height: -webkit-fill-available;
+  height: 100%;
+  height: -webkit-fill-available;
+  /* dvh — Dynamic Viewport Height — uwzględnia Dynamic Island i pasek Safari */
+  min-height: 100dvh;
   background: var(--bg); color: var(--text); font-family: var(--font-body);
   overflow: hidden;
-  /* prevent iOS bounce */
   overscroll-behavior: none;
+  /* iOS font rendering */
+  -webkit-font-smoothing: antialiased;
+  /* zapobiegaj automatycznemu powiększaniu fontów przez iOS */
+  -webkit-text-size-adjust: 100%;
 }
 
 /* ── Scanlines + ambient ── */
@@ -72,7 +87,9 @@ body::after {
 /* ── Layout ── */
 #app {
   display: flex; flex-direction: column;
-  height: 100svh; /* small viewport height — handles keyboard */
+  /* svh = small viewport (bez paska Safari), dvh = dynamic (z Dynamic Island) */
+  height: 100svh;
+  height: 100dvh;
   max-width: 900px; margin: 0 auto;
   position: relative; z-index: 1;
 }
@@ -80,9 +97,10 @@ body::after {
 /* ── Header ── */
 header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 18px;
-  padding-top: env(safe-area-inset-top);
-  height: calc(56px + env(safe-area-inset-top));
+  /* padding-top = Dynamic Island / notch safe area */
+  padding: 0 16px;
+  padding-top: max(env(safe-area-inset-top), 12px);
+  height: calc(52px + max(env(safe-area-inset-top), 12px));
   border-bottom: 1px solid var(--border);
   background: rgba(4,8,12,.95);
   backdrop-filter: blur(20px);
@@ -173,34 +191,34 @@ nav {
   background: rgba(4,8,12,.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  overflow-x: auto; flex-shrink: 0;
-  order: 99; /* push to bottom */
+  flex-shrink: 0;
+  order: 99;
+  /* home indicator safe area */
   padding-bottom: env(safe-area-inset-bottom);
 }
-nav::-webkit-scrollbar { display: none; }
 
 .nav-btn {
-  flex: 1; min-width: 60px;
-  padding: 10px 4px 8px;
+  flex: 1;
+  /* min 44px touch target (Apple HIG) + safe area */
+  padding: 10px 4px 6px;
+  min-height: 60px;
   border-radius: 0; cursor: pointer;
-  font-family: var(--font-mono); font-size: 7.5px; letter-spacing: .1em;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em;
   border: none; border-top: 2px solid transparent;
   background: transparent; color: var(--text3);
-  white-space: nowrap; transition: all .15s;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  min-height: 56px;
+  white-space: nowrap; transition: color .15s, background .15s;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  position: relative;
 }
-/* emoji icon above label */
-.nav-btn .nav-icon { font-size: 18px; line-height: 1; }
-.nav-btn .nav-label { font-size: 7px; letter-spacing: .08em; }
+.nav-btn .nav-icon { font-size: 20px; line-height: 1; }
+.nav-btn .nav-label { font-size: 9px; letter-spacing: .06em; }
 .nav-btn .cnt {
   background: var(--r); color: #fff;
   border-radius: 8px; padding: 1px 5px;
-  font-size: 8px; min-width: 16px; text-align: center;
-  position: absolute; top: 6px; right: calc(50% - 20px);
+  font-size: 9px; min-width: 17px; text-align: center;
+  position: absolute; top: 5px; right: calc(50% - 22px);
 }
-.nav-btn { position: relative; }
-.nav-btn:hover { color: var(--c); }
+.nav-btn:active { opacity: .7; }
 .nav-btn.active {
   color: var(--c);
   border-top-color: var(--c);
@@ -212,9 +230,10 @@ nav::-webkit-scrollbar { display: none; }
 #chat-messages {
   flex: 1; overflow-y: auto;
   padding: 16px 14px 8px;
-  display: flex; flex-direction: column; gap: 16px;
+  display: flex; flex-direction: column; gap: 14px;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 #chat-messages::-webkit-scrollbar { width: 2px; }
 #chat-messages::-webkit-scrollbar-thumb { background: rgba(0,229,255,.15); border-radius: 2px; }
@@ -250,8 +269,8 @@ nav::-webkit-scrollbar { display: none; }
 .tag-report { color: var(--c); background: rgba(0,229,255,.08);   border: 1px solid rgba(0,229,255,.25);  }
 
 .bubble {
-  padding: 11px 14px; border-radius: 2px 14px 14px 14px;
-  font-size: 15px; line-height: 1.65; white-space: pre-wrap;
+  padding: 12px 15px; border-radius: 2px 16px 16px 16px;
+  font-size: 16px; line-height: 1.6; white-space: pre-wrap;
   border: 1px solid var(--border);
   background: rgba(11,21,32,.8);
   color: var(--text);
@@ -289,6 +308,8 @@ nav::-webkit-scrollbar { display: none; }
 /* ── Input bar ── */
 .input-bar {
   display: flex; gap: 8px; padding: 10px 12px;
+  /* safe area dla home indicator gdy klawiatura ukryta */
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
   background: rgba(4,8,12,.95);
   -webkit-backdrop-filter: blur(16px);
@@ -296,6 +317,7 @@ nav::-webkit-scrollbar { display: none; }
   flex-shrink: 0; position: relative;
   align-items: flex-end;
 }
+/* gdy klawiatura otwarta iOS usuwa safe-area, więc padding wraca do 10px */
 .input-bar::before {
   content: '';
   position: absolute; top: 0; left: 20px; right: 20px; height: 1px;
@@ -307,32 +329,36 @@ nav::-webkit-scrollbar { display: none; }
   background: rgba(0,229,255,.05);
   border: 1px solid rgba(0,229,255,.22);
   border-radius: 20px; padding: 11px 16px;
-  color: var(--c); font-family: var(--font-body); font-size: 16px; /* 16px prevents iOS zoom */
-  outline: none; transition: border-color .2s, box-shadow .2s;
+  color: var(--c); font-family: var(--font-body);
+  /* 16px OBOWIĄZKOWE — zapobiega auto-zoom iOS przy focusie */
+  font-size: 16px;
+  outline: none; transition: border-color .2s;
   caret-color: var(--c);
-  resize: none; max-height: 120px; overflow-y: auto;
+  resize: none; max-height: 100px; overflow-y: auto;
   line-height: 1.4;
   -webkit-appearance: none;
+  /* smooth scroll na iOS */
+  -webkit-overflow-scrolling: touch;
 }
 #msg-input::placeholder { color: var(--text3); }
 #msg-input:focus { border-color: rgba(0,229,255,.55); box-shadow: 0 0 16px rgba(0,229,255,.1); }
 
 #send-btn {
-  width: 44px; height: 44px; flex-shrink: 0;
+  width: 46px; height: 46px; flex-shrink: 0;
   border: 1px solid rgba(0,229,255,.4);
   border-radius: 50%; background: rgba(0,229,255,.12);
-  color: var(--c); font-size: 18px; cursor: pointer;
-  transition: all .15s; display: flex; align-items: center; justify-content: center;
+  color: var(--c); font-size: 20px; cursor: pointer;
+  transition: background .15s; display: flex; align-items: center; justify-content: center;
   box-shadow: 0 0 14px rgba(0,229,255,.12);
 }
-#send-btn:active { background: rgba(0,229,255,.28); transform: scale(.94); }
-#send-btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+#send-btn:active { background: rgba(0,229,255,.3); }
+#send-btn:disabled { opacity: .35; box-shadow: none; }
 
 #mic-btn {
-  width: 44px; height: 44px; flex-shrink: 0;
+  width: 46px; height: 46px; flex-shrink: 0;
   border: 1px solid rgba(0,229,255,.28);
   border-radius: 50%; background: rgba(0,229,255,.06);
-  color: var(--text3); font-size: 18px; cursor: pointer;
+  color: var(--text3); font-size: 20px; cursor: pointer;
   transition: all .25s; display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
 }
@@ -558,10 +584,13 @@ nav::-webkit-scrollbar { display: none; }
 .cal-drawer {
   display: none; position: absolute; bottom: 0; left: 0; right: 0;
   background: rgba(7,14,20,.97); border-top: 1px solid var(--border-hi);
-  backdrop-filter: blur(20px); z-index: 50;
-  max-height: 55%; overflow-y: auto;
-  border-radius: 12px 12px 0 0;
-  animation: drawerUp .2s ease;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 50;
+  max-height: 60%; overflow-y: auto;
+  border-radius: 16px 16px 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-overflow-scrolling: touch;
 }
 .cal-drawer.open { display: block; }
 @keyframes drawerUp { from{transform:translateY(30px);opacity:0} to{transform:none;opacity:1} }
@@ -793,7 +822,7 @@ nav::-webkit-scrollbar { display: none; }
   flex: 1; background: rgba(0,229,255,.04);
   border: 1px solid rgba(0,229,255,.18); border-radius: 12px;
   padding: 11px 14px; color: var(--text);
-  font-family: var(--font-body); font-size: 15px;
+  font-family: var(--font-body); font-size: 16px;
   outline: none; caret-color: var(--c); transition: border-color .2s, box-shadow .2s;
   -webkit-appearance: none;
 }
@@ -871,17 +900,19 @@ nav::-webkit-scrollbar { display: none; }
 .cal-modal-overlay {
   position: fixed; inset: 0; z-index: 9000;
   background: rgba(0,0,0,.65); backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: none; align-items: flex-end; justify-content: center;
-  padding-bottom: env(safe-area-inset-bottom);
 }
-.cal-modal-overlay.open { display: flex; animation: slideUp .25s ease; }
-@keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:none;opacity:1} }
+.cal-modal-overlay.open { display: flex; animation: slideUp .28s cubic-bezier(.32,1,.23,1); }
+@keyframes slideUp { from{transform:translateY(80px);opacity:0} to{transform:none;opacity:1} }
 .cal-modal {
   width: 100%; max-width: 560px;
   background: rgba(7,14,20,.98); border: 1px solid var(--border);
   border-top: 1px solid rgba(0,229,255,.3);
   border-radius: 20px 20px 0 0;
   overflow: hidden;
+  /* safe area dla home indicator */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .cal-modal-hdr {
   display: flex; align-items: center; justify-content: space-between;
@@ -896,7 +927,7 @@ nav::-webkit-scrollbar { display: none; }
   width: 100%; background: rgba(0,229,255,.04);
   border: 1px solid rgba(0,229,255,.18); border-radius: 10px;
   padding: 11px 14px; color: var(--text);
-  font-family: var(--font-body); font-size: 15px;
+  font-family: var(--font-body); font-size: 16px;
   outline: none; transition: border-color .2s;
   -webkit-appearance: none; color-scheme: dark;
 }
@@ -958,6 +989,7 @@ nav::-webkit-scrollbar { display: none; }
 /* ── Notes layout ── */
 .notes-layout {
   display: flex; flex-direction: column; flex: 1; overflow: hidden;
+  position: relative;
 }
 
 /* ── Notes list view ── */
@@ -1013,6 +1045,11 @@ nav::-webkit-scrollbar { display: none; }
   display: flex; align-items: center; gap: 10px;
 }
 .note-item:active { background: rgba(0,229,255,.06); }
+/* iOS: immediate visual feedback on tap */
+.nav-btn:active { opacity: .6; transform: scale(.96); }
+.report-btn:active { transform: scale(.97); opacity: .8; }
+.cal-nav-btn:active { background: rgba(0,229,255,.28); }
+.notes-new-btn:active { transform: scale(.9); }
 .note-item.active { background: rgba(0,229,255,.07); }
 
 .note-item-body { flex: 1; min-width: 0; }
@@ -1093,7 +1130,9 @@ nav::-webkit-scrollbar { display: none; }
   flex: 1; background: transparent; border: none; outline: none; resize: none;
   color: var(--text); font-size: 16px; line-height: 1.8;
   font-family: var(--font-body); padding: 16px 18px;
-  caret-color: var(--c); -webkit-overflow-scrolling: touch;
+  caret-color: var(--c);
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 .notes-body-input::placeholder { color: var(--text3); }
 .notes-editor-footer {
@@ -1104,6 +1143,25 @@ nav::-webkit-scrollbar { display: none; }
 }
 /* old sidebar — hide it */
 .notes-sidebar, .notes-editor { display: none !important; }
+
+/* ── iOS / iPhone specific ── */
+@supports (-webkit-touch-callout: none) {
+  /* Zapobiega ghost click delay */
+  a, button { -webkit-touch-callout: none; }
+
+  /* Lepszy scroll na listach */
+  .notes-list-inner,
+  #chat-messages,
+  .cal-body,
+  .data-scroll,
+  #tasks-scroll { -webkit-overflow-scrolling: touch; }
+
+  /* Zapobiega bounce scroll na głównym kontenerze */
+  #app { overscroll-behavior: none; }
+
+  /* Ukryj scrollbar na iOS (i tak jest niewidoczny) */
+  ::-webkit-scrollbar { display: none; }
+}
 
 /* ── Tasks toolbar ── */
 .tasks-toolbar {
@@ -1183,6 +1241,305 @@ nav::-webkit-scrollbar { display: none; }
   color: var(--text3); padding: 14px 4px 8px; border-bottom: 1px solid var(--border);
   margin-bottom: 10px;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   iPhone 16 — Dedicated Optimizations
+   Screen: 393×852 pt / 1179×2556 px / 460 ppi
+   Dynamic Island: 37×12 mm centered at top
+   Safe areas: top ~59px, bottom ~34px (home indicator)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── iPhone 16 safe area variables ── */
+:root {
+  --sat: env(safe-area-inset-top, 59px);
+  --sab: env(safe-area-inset-bottom, 34px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+/* ── Prevent iOS rubber-band on root ── */
+html { overflow: hidden; position: fixed; width: 100%; }
+body { overflow: hidden; position: fixed; width: 100%; height: 100%; }
+
+/* ── Main layout: full dynamic viewport ── */
+#app {
+  height: 100dvh;
+  /* Offset left/right for rotated use too */
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+}
+
+/* ── Header: respect Dynamic Island ── */
+header {
+  padding-top: max(var(--sat), 14px);
+  /* taller header to clear Dynamic Island (iPhone 16 island is ~37px + 12px gap) */
+  height: calc(58px + max(var(--sat), 14px));
+  padding-left: max(16px, var(--sal));
+  padding-right: max(16px, var(--sar));
+}
+
+/* Dynamic Island safe glow — avoid placing content in island zone */
+header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 126px; /* iPhone 16 island width */
+  height: max(var(--sat), 14px);
+  background: rgba(0,0,0,.95); /* matches Dynamic Island pill */
+  border-radius: 0 0 20px 20px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── Bottom nav: home indicator clearance ── */
+nav {
+  padding-bottom: max(var(--sab), 8px);
+  /* slightly taller touch targets on iPhone 16 */
+}
+
+.nav-btn {
+  /* Apple HIG: 44pt minimum, we give 54pt for comfort */
+  min-height: 54px;
+  padding: 10px 4px max(8px, calc(var(--sab) * 0.25));
+  /* Bigger icons on ProMax/16 screens */
+  gap: 4px;
+}
+.nav-btn .nav-icon { font-size: 22px; }
+.nav-btn .nav-label { font-size: 10px; letter-spacing: .04em; }
+
+/* ── Input bar: sits above home indicator ── */
+.input-bar {
+  padding-left: max(12px, var(--sal));
+  padding-right: max(12px, var(--sar));
+  /* When keyboard is open iOS adjusts viewport, safe area returns to 0 — fine */
+  padding-bottom: max(12px, calc(var(--sab) * 0.5));
+  /* Extra breathing room */
+  gap: 10px;
+}
+
+/* ── Input field: 16px mandatory (prevents zoom on iOS) ── */
+#msg-input {
+  font-size: 16px !important;
+  /* pill shape fits iPhone aesthetic */
+  border-radius: 22px;
+  padding: 12px 18px;
+  /* allow up to 3 lines before scrolling */
+  max-height: 80px;
+}
+
+/* ── Buttons: 44pt minimum touch target ── */
+#send-btn, #mic-btn {
+  width: 48px;
+  height: 48px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Chat: smooth momentum scroll ── */
+#chat-messages {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: 16px 16px 12px;
+  /* Account for input bar + bottom nav */
+}
+
+/* ── Message bubbles: slightly wider on 393pt screen ── */
+.bubble-wrap { max-width: 84%; }
+.bubble {
+  font-size: 16px; /* readable on Retina */
+  line-height: 1.55;
+  border-radius: 4px 18px 18px 18px;
+}
+.msg.user .bubble { border-radius: 18px 4px 18px 18px; }
+
+/* ── Avatar: slightly larger ── */
+.avatar { width: 32px; height: 32px; font-size: 12px; }
+
+/* ── Notes: full-screen editor on iPhone ── */
+.notes-editor-view {
+  /* Slide in from right — native iOS feel */
+  transform: translateX(100%);
+  transition: transform .3s cubic-bezier(.32,1,.23,1);
+  position: absolute; inset: 0; z-index: 10;
+  background: var(--bg);
+}
+.notes-editor-view.visible {
+  transform: translateX(0);
+}
+.notes-list-view {
+  transition: transform .3s cubic-bezier(.32,1,.23,1);
+}
+.notes-list-view.hidden {
+  transform: translateX(-40px);
+}
+
+/* ── Notes editor: larger touch targets ── */
+.notes-back-btn {
+  font-size: 16px;
+  padding: 8px 14px 8px 4px;
+  min-height: 44px;
+}
+.notes-del-btn {
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 20px;
+}
+.notes-body-input {
+  font-size: 16px;
+  padding: 18px 20px;
+  padding-bottom: max(20px, var(--sab));
+}
+.notes-title-input { font-size: 17px; font-weight: 700; }
+
+/* ── Calendar: larger tap targets ── */
+.cal-nav-btn {
+  width: 36px; height: 36px;
+  min-width: 44px; min-height: 44px;
+}
+.cal-add-btn {
+  width: 40px; height: 40px;
+  min-width: 44px; min-height: 44px;
+}
+.cal-cell { min-height: 68px; }
+
+/* ── Modal: slides from bottom, full width on iPhone ── */
+.cal-modal {
+  border-radius: 24px 24px 0 0;
+  padding-bottom: max(env(safe-area-inset-bottom), 20px);
+}
+.cal-modal-input {
+  font-size: 16px !important; /* prevent zoom */
+  border-radius: 12px;
+  padding: 13px 16px;
+}
+.cal-modal-save-btn {
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 13px;
+}
+
+/* ── API Key overlay: keyboard-aware ── */
+.apikey-box {
+  padding: 36px 28px;
+  /* lower on screen so keyboard doesn't cover it */
+  margin-bottom: calc(max(var(--sab), 20px) + 20px);
+  border-radius: 16px;
+}
+#apikey-input {
+  font-size: 16px !important;
+  padding: 14px 16px;
+  border-radius: 10px;
+}
+#apikey-save {
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* ── Task add form ── */
+.tasks-add-input {
+  font-size: 16px !important;
+  border-radius: 14px;
+  padding: 13px 16px;
+}
+.tasks-add-btn {
+  width: 46px;
+  height: 46px;
+  min-width: 44px;
+  border-radius: 14px;
+}
+
+/* ── Drawer: safe area bottom ── */
+.cal-drawer {
+  padding-bottom: max(var(--sab), 20px);
+  border-radius: 20px 20px 0 0;
+}
+
+/* ── Delete buttons: bigger tap area ── */
+.del-btn, .cal-drawer-del, .note-item-del {
+  min-width: 44px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Task toggle (checkbox replacement): bigger ── */
+.task-toggle {
+  width: 28px; height: 28px;
+  min-width: 44px; min-height: 44px;
+  /* extend tap area without changing visual size */
+  padding: 8px;
+  box-sizing: content-box;
+  margin: -8px;
+  margin-right: 2px;
+}
+
+/* ── Status bar text: slightly larger ── */
+.status-text { font-size: 10px; }
+
+/* ── Scrollable lists: hide scrollbars (iOS style) ── */
+.notes-list-inner,
+#chat-messages,
+.cal-body,
+.data-scroll,
+#tasks-scroll,
+.cal-week-body,
+.cal-day-body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.notes-list-inner::-webkit-scrollbar,
+#chat-messages::-webkit-scrollbar,
+.cal-body::-webkit-scrollbar,
+.data-scroll::-webkit-scrollbar,
+#tasks-scroll::-webkit-scrollbar { display: none; }
+
+/* ── Stat boxes: adjust for narrow screen ── */
+@media (max-width: 430px) {
+  .report-grid { grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .stat-num { font-size: 26px; }
+  .stat-box { padding: 14px 8px; }
+  .stat-lbl { font-size: 7px; letter-spacing: .15em; }
+
+  /* Calendar: compact toolbar */
+  .cal-period-label { font-size: 10px; min-width: 100px; }
+  .cal-seg-btn { padding: 5px 8px; font-size: 7px; }
+
+  /* Logo: tighter on narrow */
+  .logo-title { font-size: 14px; letter-spacing: .2em; }
+  .logo-sub { font-size: 7px; }
+  .logo-ring { width: 32px; height: 32px; font-size: 13px; }
+
+  /* Nav badges: reposition */
+  .nav-btn .cnt { right: calc(50% - 20px); }
+}
+
+/* ── iPhone 16 Pro / 16 Pro Max (430pt wide) ── */
+@media (min-width: 430px) {
+  .bubble-wrap { max-width: 80%; }
+  .bubble { font-size: 16px; }
+  header {
+    /* Pro Max: island same size, more padding */
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* ── Reduce motion (accessibility) ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ── Dark mode colors already set, but make sure ── */
+@media (prefers-color-scheme: dark) {
+  .cal-modal-input, .tasks-add-input, #msg-input, #apikey-input {
+    color-scheme: dark;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1258,7 +1615,7 @@ nav::-webkit-scrollbar { display: none; }
       <button id="mic-btn" onclick="toggleMic()" title="Nagrywanie głosu">🎤</button>
       <textarea id="msg-input" rows="1"
         placeholder="Wpisz wiadomość lub użyj mikrofonu..."
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
       <button id="send-btn" onclick="sendMsg()">→</button>
     </div>
   </div>
@@ -1653,6 +2010,7 @@ async function sendMsg(){
   const text=inp.value.trim();
   if(!text)return;
   inp.value='';
+  inp.blur(); // dismiss keyboard on iOS after send
   setLoading(true);
   addUserMsg(text);
   showTyping();
@@ -2342,23 +2700,51 @@ function updateBellIcon() {
 
 async function requestNotifPermission() {
   if (!('Notification' in window)) {
-    alert('Twoja przeglądarka nie obsługuje powiadomień.\nNa iOS wymagana jest instalacja jako PWA (Dodaj do ekranu głównego).');
+    // iOS w Safari (nie PWA) — powiadomienia niedostępne
+    if (isIOS() && !isStandalone()) {
+      alert('Na iPhone wymagane jest dodanie aplikacji do ekranu głównego.\n\nSafari → Udostępnij → Dodaj do ekranu głównego\n\nPotem otwórz JARVIS z ekranu głównego i włącz powiadomienia.');
+    } else {
+      alert('Twoja przeglądarka nie obsługuje powiadomień.');
+    }
     return;
   }
   if (Notification.permission === 'denied') {
-    alert('Powiadomienia są zablokowane.\nWejdź w Ustawienia → Safari → Powiadomienia i odblokuj tę witrynę.');
+    if (isIOS()) {
+      alert('Powiadomienia są zablokowane.\n\nUstawienia → JARVIS → Powiadomienia → włącz');
+    } else {
+      alert('Powiadomienia są zablokowane.\nOdblokuj w ustawieniach przeglądarki.');
+    }
     return;
   }
   const perm = await Notification.requestPermission();
   updateBellIcon();
   if (perm === 'granted') {
-    sendNotification('🔔 JARVIS', 'Powiadomienia włączone! Będziesz dostawać alerty o wydarzeniach i zadaniach.', 'welcome');
+    sendNotification('🔔 JARVIS', 'Powiadomienia włączone.', 'welcome');
   }
 }
 
-// Core function: send via SW if available, fallback to direct Notification
+// Detect iOS PWA
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+function isStandalone() {
+  return window.navigator.standalone === true;
+}
+
+// Core function: send notification
+// iOS wymaga: PWA (dodana do ekranu głównego) + iOS 16.4+
+// Na iOS SW.showNotification działa TYLKO z push subscription — bez niej używamy new Notification()
 async function sendNotification(title, body, tag) {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const notifTag = tag || 'jarvis-' + Date.now();
+
+  // iOS: zawsze użyj new Notification() — SW.showNotification bez push nie działa
+  if (isIOS()) {
+    try { new Notification(title, { body, icon: 'icon-192.png', tag: notifTag }); } catch(_) {}
+    return;
+  }
+
+  // Pozostałe platformy: preferuj SW (działa w tle)
   try {
     if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.ready;
@@ -2366,16 +2752,15 @@ async function sendNotification(title, body, tag) {
         body,
         icon: 'icon-192.png',
         badge: 'icon-192.png',
-        tag: tag || 'jarvis-' + Date.now(),
+        tag: notifTag,
         renotify: true,
         vibrate: [200, 100, 200],
       });
     } else {
-      new Notification(title, { body, icon: 'icon-192.png', tag });
+      new Notification(title, { body, icon: 'icon-192.png', tag: notifTag });
     }
   } catch(e) {
-    // fallback for browsers where SW showNotification fails
-    try { new Notification(title, { body, tag }); } catch(_) {}
+    try { new Notification(title, { body, tag: notifTag }); } catch(_) {}
   }
 }
 
@@ -2514,6 +2899,131 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   });
 }
+
+
+// ── iPhone 16 / iOS specific JS ──────────────────────────────────
+
+// 1. Visual viewport resize handler (keyboard open/close)
+// iOS doesn't resize window when keyboard opens — use visualViewport API
+if (window.visualViewport) {
+  let lastVH = window.visualViewport.height;
+  window.visualViewport.addEventListener('resize', () => {
+    const vh = window.visualViewport.height;
+    const diff = lastVH - vh;
+    // keyboard opened (viewport shrank significantly)
+    if (diff > 100) {
+      // scroll chat to bottom when keyboard opens
+      const chat = document.getElementById('chat-messages');
+      if (chat) setTimeout(() => chat.scrollTop = chat.scrollHeight, 100);
+    }
+    lastVH = vh;
+    // Update --dvh for any vh-based calculations
+    document.documentElement.style.setProperty('--dvh', vh + 'px');
+  });
+  // Set initial
+  document.documentElement.style.setProperty('--dvh', window.visualViewport.height + 'px');
+}
+
+// 2. Prevent double-tap zoom on buttons (iOS legacy)
+document.addEventListener('dblclick', e => {
+  if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
+// 3. Prevent pinch-zoom (already disabled via meta but belt-and-suspenders)
+document.addEventListener('touchmove', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+// 4. Momentum scroll fix — allow scrollable containers
+const scrollables = [
+  '#chat-messages', '.notes-list-inner', '.cal-body',
+  '.data-scroll', '#tasks-scroll', '.cal-week-body', '.cal-day-body',
+  '.cal-drawer', '.notes-body-input'
+];
+document.addEventListener('touchstart', e => {
+  const inScrollable = scrollables.some(sel => e.target.closest(sel));
+  if (!inScrollable) {
+    // outside scrollable — allow tap, prevent scroll
+  }
+}, { passive: true });
+
+// 5. Auto-dismiss keyboard when tapping outside input/textarea
+document.addEventListener('touchend', e => {
+  const isInput = e.target.matches('input, textarea') || e.target.closest('input, textarea');
+  if (!isInput && document.activeElement.matches('input, textarea')) {
+    document.activeElement.blur();
+  }
+}, { passive: true });
+
+// 6. Fix iOS bounce on #app container
+const app = document.getElementById('app');
+if (app) {
+  app.addEventListener('touchmove', e => {
+    // Allow scrolling inside scrollable children
+    const inScrollable = scrollables.some(sel => e.target.closest(sel));
+    if (!inScrollable) e.preventDefault();
+  }, { passive: false });
+}
+
+// 7. iPhone haptic feedback via vibration API (works on some iOS builds)
+function haptic(type) {
+  if (!navigator.vibrate) return;
+  if (type === 'light') navigator.vibrate(5);
+  else if (type === 'medium') navigator.vibrate(10);
+  else if (type === 'success') navigator.vibrate([5, 50, 5]);
+}
+
+// Patch sendMsg to add haptic
+const _origSend = window.sendMsg || sendMsg;
+window.sendMsg = async function() {
+  haptic('light');
+  return _origSend.apply(this, arguments);
+};
+
+// Patch toggleTask for haptic
+const _origToggle = window.toggleTask || toggleTask;
+window.toggleTask = async function(id) {
+  haptic('success');
+  return _origToggle.apply(this, arguments);
+};
+
+// 8. Show "Add to Home Screen" prompt if on iOS Safari (not PWA)
+function showAddToHomePrompt() {
+  if (!isIOS()) return;
+  if (isStandalone()) return;
+  if (localStorage.getItem('jarvis_a2hs_dismissed')) return;
+
+  const banner = document.createElement('div');
+  banner.style.cssText = [
+    'position:fixed', 'bottom:calc(env(safe-area-inset-bottom,34px) + 80px)',
+    'left:16px', 'right:16px', 'z-index:99999',
+    'background:rgba(11,21,32,.97)', 'border:1px solid rgba(0,229,255,.35)',
+    'border-radius:14px', 'padding:14px 16px',
+    'font-family:var(--font-body)', 'font-size:13px',
+    'color:var(--text)', 'line-height:1.5',
+    'box-shadow:0 8px 32px rgba(0,0,0,.5)',
+    'display:flex', 'align-items:center', 'gap:12px'
+  ].join(';');
+  banner.innerHTML = `
+    <span style="font-size:24px;flex-shrink:0">◈</span>
+    <div style="flex:1">
+      <strong style="color:var(--c);font-family:var(--font-mono);font-size:11px;letter-spacing:.15em">DODAJ DO EKRANU GŁÓWNEGO</strong><br>
+      Safari → <span style="color:var(--c)">Udostępnij</span> → <span style="color:var(--c)">Dodaj do ekranu głównego</span><br>
+      <span style="font-size:11px;color:var(--text3)">Dla pełnego ekranu i powiadomień</span>
+    </div>
+    <button onclick="this.parentElement.remove();localStorage.setItem('jarvis_a2hs_dismissed','1')"
+      style="background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;min-width:44px;min-height:44px">✕</button>
+  `;
+  document.body.appendChild(banner);
+  // auto-hide after 12s
+  setTimeout(() => banner.remove(), 12000);
+}
+
+// Show prompt 2s after load
+setTimeout(showAddToHomePrompt, 2000);
+
 </script>
 </body>
 </html>
